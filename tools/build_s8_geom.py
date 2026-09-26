@@ -112,7 +112,10 @@ def build(with_prompt=True):
             if ots:
                 c["ots"] = True
             cams.append(c)
-        cuts = [{"tc": "%g-%g초" % (s, e), "lb": "%s · %s %d°" % (ref, size, fov),
+        # 주의: 카메라 루프의 size/fov 는 여기서 쓰면 마지막 컷 값으로 새므로 컷별로 lookup 한다.
+        by_ref = {c["cutRef"]: c for c in cams}
+        cuts = [{"tc": "%g-%g초" % (s, e),
+                 "lb": "%s · %s %d°" % (ref, by_ref[ref]["shotSize"], by_ref[ref]["fov"]),
                  "dlg": "", "speaker": "", "dlgPlain": "", "ko": "", "en": ""}
                 for (ref, s, e) in CUTS[pid]]
         parts.append({"partId": pid, "title": "", "duration": DUR[pid], "mode": "멀티컷",

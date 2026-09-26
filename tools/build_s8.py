@@ -223,9 +223,11 @@ def assemble():
                 if ln.startswith("대사 — "):
                     cut["speaker"] = ln.split(" — ")[1].split(":")[0]
                     cut["dlg"] = cut["dlgPlain"] = ln.split("{")[1].rstrip("}")
-        # 보드 익스포트용
+        # 보드 익스포트용 — 원문이 아니라 치환 완료된 컷 본문을 쓴다 ({LOC}/{CAB} 잔존 방지)
+        by_ref = {c["lb"].split(" · ")[0].strip(): c for c in p["prompt"]["cuts"]}
         p["actions"] = [{"cutRef": ref, "actorId": cam[4], "actionType": "see_timeline",
-                         "start": s, "end": e, "text": C.CUT_TEXT[ref][0][1][:60]}
+                         "start": s, "end": e,
+                         "text": by_ref[ref]["ko"].split("\n")[-1][:60]}
                         for (ref, s, e), cam in zip(CUTS[pid], CAM[pid])]
         p["dialogueSchedule"] = [{"actorId": next((x["id"] for x in chars if x["name"] == c["speaker"]), None),
                                   "speakerName": c["speaker"], "line": c["dlgPlain"],
