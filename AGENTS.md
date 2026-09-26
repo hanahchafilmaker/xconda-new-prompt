@@ -31,9 +31,18 @@
 make check                      # 스킬 무결성 + 회귀 테스트 (validate.py · python · node)
 make check-scene S=<씬.json>    # 블로킹 검수 — "문제 0건"이 목표 (§16 체크리스트)
 make sync-scene  S=<씬.json>    # 좌표 → "첫 프레임 공간 —" 문장을 컷에 삽입 (한국어만)
+make engine-html                # 웹에 올릴 편집기 UI(index.html) 재생성
 ```
 
-`make engine` 을 띄우면 편집기를 브라우저에서 열어 씬 JSON을 끌어다 넣을 수 있다.
+`make check` 에는 UI 렌더 검사(`make test-ui`)도 들어 있다 — 편집기를 jsdom에서 실제로 실행해
+탭·컷 패널·10블록이 그려지는지 본다. (jsdom 설치: `make setup-web`)
+
+`make engine` 을 띄우면 브라우저에서 **저장소 루트(`/`)가 곧 편집기 UI**다 — 씬이 이미 심겨 있어
+열자마자 파트 탭·컷별 패널·10블록 프롬프트가 나온다. 씬 JSON을 직접 끌어다 넣을 때만
+`/engine`(빈 템플릿)을 쓴다.
+
+**"웹에서 UI가 안 보임" 이라고 하면** — 루트의 `index.html`이 없거나 낡은 것이다.
+`make engine-html` 로 다시 만들고 `make test-ui` 로 렌더를 확인한다.
 
 ## 4. 좌표 규약 (헷갈리기 쉬움)
 
@@ -56,6 +65,10 @@ make sync-scene  S=<씬.json>    # 좌표 → "첫 프레임 공간 —" 문장�
 ## 6. 파일 구조
 
 ```
+index.html                       웹에 보이는 편집기 UI (씬 내장) — make engine-html 로 재생성
+tools/serve.py                   편집기를 웹에 띄우는 서버 (/ · /engine · /scene · /__status)
+tools/build_editor.py            build_s8.py → output/ → index.html
+tools/build_s8.py                S#8 씬 JSON + 편집기 빌더
 xconda-new-prompt.skill          배포용 패키지(폴더를 zip한 것) — make repack 으로 갱신
 xconda-new-prompt/               스킬 작업 사본 (실제로 읽고 실행하는 곳)
   SKILL.md                       스킬 본문 — 트리거·규칙 전부
@@ -69,5 +82,6 @@ xconda-new-prompt/               스킬 작업 사본 (실제로 읽고 실행�
   examples/    정식 템플릿 2개 + 예제
   scripts/validate.py            스킬 자체 무결성 점검기
 tests/                           위 어댑터·검수 회귀 테스트 (python + node)
-Makefile                         make check / check-scene / sync-scene / engine / repack
+  test_engine_ui_render.mjs      편집기를 jsdom에서 실제로 실행 — UI가 그려지는지 본다
+Makefile                         make check / check-scene / sync-scene / engine / engine-html / repack
 ```

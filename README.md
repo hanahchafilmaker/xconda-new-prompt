@@ -15,10 +15,47 @@ XCONDA(엑스콘다) — Seedance 2.5/2.0 영상 프롬프트 에디터 스킬.
 ## 바로 써보기
 
 ```bash
-make check          # 스킬 무결성 + 회귀 테스트 (validate.py · python 12건 · node 12건)
-make engine         # 편집기를 http://localhost:8080/xconda-new-prompt/assets/xconda_engine.html 로
+make check          # 스킬 무결성 + 회귀 테스트 (validate.py · python · node · UI 렌더)
+make engine         # 편집기 UI를 http://localhost:8080/ 로  ← 저장소 루트가 곧 UI
+make setup-web      # UI 테스트용 jsdom 설치 (처음 한 번)
 make check-scene S=tests/fixtures/scene_v1_sample.json   # 예제 씬 블로킹 검수 → "문제 0건"
 ```
+
+`make engine` 을 띄우면 **루트(`/`)를 여는 것만으로 씬이 이미 심긴 편집기 화면이 나온다.**
+씬 JSON을 직접 끌어다 넣고 싶을 때만 `/engine`(빈 편집기)을 연다.
+
+| URL | 무엇 |
+|---|---|
+| `/` | 편집기 UI — S8 씬 내장, 열자마자 파트 5개·컷 패널·10블록 프롬프트가 보임 |
+| `/engine` | 스킬 원본 편집기 템플릿 — 빈 화면, 씬 JSON 드롭용 |
+| `/scene` | 현재 UI에 심긴 씬 JSON |
+| `/__status` | 서버·파일 상태 (스크립트 점검용) |
+
+## v9.13.1 — "웹에서 UI가 안 보임" 고친 것
+
+**증상**: 브라우저를 열면 디렉터리 목록만 나오고 편집기 화면이 안 보였다.
+
+**원인** (둘 다 실제 확인한 것):
+
+1. 저장소 루트에 `index.html`이 없었다. 그래서 `/` 는 파일 목록이었고, UI는
+   `xconda-new-prompt/assets/xconda_engine.html` 라는 깊은 경로에 있었다.
+2. 그 원본 편집기는 `const EMBEDDED_SCENE = {};` — **씬이 비어 있다.** 열어도 드롭존뿐이라
+   "화면이 없다"고 보이기 쉽다. 씬이 심긴 편집기는 `tools/build_s8.py`가 `output/`에 만드는데,
+   `output/`은 `.gitignore` 대상이라 **클론하면 아예 존재하지 않았다.**
+
+**조치**:
+
+| 바꾼 것 | 역할 |
+|---|---|
+| `index.html` (커밋됨) | 씬이 심긴 편집기 UI. `output/`이 아니라 루트에 두므로 클론해도 사라지지 않는다 |
+| `tools/serve.py` | `/` → `index.html`, `/engine` → 빈 템플릿, `/scene`, `/__status` 를 주는 서버 (`0.0.0.0`) |
+| `tools/build_editor.py` | `build_s8.py` 실행 → `output/` → `index.html` 로 복사 (`make engine-html`) |
+| `tests/test_engine_ui_render.mjs` | 편집기를 jsdom에서 **실제로 실행**해 탭 5개·컷 패널·10블록·textarea가 그려지는지 검사 (`make test-ui`, `make check`에 포함) |
+| `package.json` | 위 테스트의 dev 의존성 jsdom (`make setup-web`) |
+
+UI 렌더 테스트는 빈 템플릿을 `index.html`에 덮어씌우면 15건이 실패하고 종료 1로 끝난다 —
+"그냥 통과하는" 테스트가 아니라 실제로 화면을 본다.
+
 
 에이전트가 이 저장소에서 스킬을 언제·어떻게 켜야 하는지는 [`AGENTS.md`](AGENTS.md)에 적어뒀다.
 
