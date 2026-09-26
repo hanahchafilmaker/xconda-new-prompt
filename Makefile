@@ -5,6 +5,7 @@
 #   make test     파이썬 회귀 테스트 (씬 JSON 호환 · 블로킹 검수)
 #   make test-js  편집기(xconda_engine.html) room 호환 블록 테스트
 #   make test-ui  편집기 UI 렌더 스모크 테스트 (jsdom — 웹에서 보이는지 확인)
+#   make test-storyboard 글콘티 작업실(storyboard.html) UI/스토리지/파서 테스트
 #   make check-scene S=path/to/scene.json   씬 JSON 블로킹 검수 (0건이 목표)
 #   make sync-scene  S=path/to/scene.json   좌표 → "첫 프레임 공간" 문장 삽입
 #   make engine-html  웹에 올릴 편집기 UI(index.html) 만들기 ← UI가 안 보일 때 이걸 먼저
@@ -18,10 +19,10 @@ ARCHIVE := xconda-new-prompt.skill
 PORT    ?= 8080
 S       ?= tests/fixtures/scene_v1_sample.json
 
-.PHONY: check validate test test-js test-ui check-scene sync-scene engine engine-html setup-web repack extract clean-pyc
+.PHONY: check validate test test-js test-ui test-storyboard check-scene sync-scene engine engine-html setup-web repack extract clean-pyc
 
-check: validate test test-js test-ui
-	@echo "\n[확인 완료] 스킬 무결성 · 파이썬 · 편집기 JS · UI 렌더 모두 통과"
+check: validate test test-js test-ui test-storyboard
+	@echo "\n[확인 완료] 스킬 무결성 · 파이썬 · 편집기 JS · UI 렌더 · 글콘티 스튜디오 모두 통과"
 
 validate:
 	cd $(SKILL) && python3 scripts/validate.py
@@ -34,6 +35,9 @@ test-js:
 
 test-ui:
 	node tests/test_engine_ui_render.mjs
+
+test-storyboard:
+	node tests/test_storyboard_ui.mjs
 
 setup-web:
 	npm install

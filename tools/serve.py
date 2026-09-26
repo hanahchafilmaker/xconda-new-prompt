@@ -23,6 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILL = os.path.join(ROOT, "xconda-new-prompt")
 EDITOR = os.path.join(ROOT, "index.html")                       # 커밋된 편집기 UI
 EDITOR_SRC = os.path.join(ROOT, "output", "S8_xconda_editor.html")  # 빌드 산출물 원본
+STORYBOARD = os.path.join(ROOT, "storyboard.html")             # 글콘티 작업실 UI
 SCENE = os.path.join(ROOT, "output", "S8_scene.json")
 
 MISSING = """<!doctype html>
@@ -41,10 +42,21 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=ROOT, **kw)
 
+    def do_HEAD(self):
+        path = self.path.split("?", 1)[0]
+        if path in ("/", "/index.html", "/editor", "/storyboard", "/storyboard.html", "/conti", "/engine", "/scene", "/__status"):
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            return
+        return super().do_HEAD()
+
     def do_GET(self):
         path = self.path.split("?", 1)[0]
         if path in ("/", "/index.html", "/editor"):
             return self._send_file(EDITOR, "text/html; charset=utf-8", fallback=MISSING)
+        if path in ("/storyboard", "/storyboard.html", "/conti"):
+            return self._send_file(STORYBOARD, "text/html; charset=utf-8")
         if path == "/engine":
             return self._send_file(os.path.join(SKILL, "assets", "xconda_engine.html"),
                                    "text/html; charset=utf-8")
@@ -54,6 +66,8 @@ class Handler(SimpleHTTPRequestHandler):
             body = json.dumps({
                 "editor_html": os.path.exists(EDITOR),
                 "editor_bytes": os.path.getsize(EDITOR) if os.path.exists(EDITOR) else 0,
+                "storyboard_html": os.path.exists(STORYBOARD),
+                "storyboard_bytes": os.path.getsize(STORYBOARD) if os.path.exists(STORYBOARD) else 0,
                 "scene_json": os.path.exists(SCENE),
                 "engine_template": os.path.exists(os.path.join(SKILL, "assets", "xconda_engine.html")),
             }, ensure_ascii=False)
@@ -89,6 +103,7 @@ class Handler(SimpleHTTPRequestHandler):
 def main():
     port = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.environ.get("PORT", 8080))
     httpd = ThreadingHTTPServer(("0.0.0.0", port), Handler)
+    print("XCONDA 글콘티 : http://0.0.0.0:%d/storyboard  (글콘티 입력 및 저장소)" % port)
     print("XCONDA 편집기  : http://0.0.0.0:%d/          (씬이 심긴 UI)" % port)
     print("빈 편집기      : http://0.0.0.0:%d/engine    (씬 JSON 드롭용)" % port)
     print("상태 점검      : http://0.0.0.0:%d/__status" % port)
