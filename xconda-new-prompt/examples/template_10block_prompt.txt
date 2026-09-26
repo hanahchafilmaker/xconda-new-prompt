@@ -1,0 +1,99 @@
+XCONDA 10-BLOCK PROMPT TEMPLATE (Seedance 2.5/2.0)
+실제 편집기(assembleEn()/assembleKo())가 뽑는 블록 순서·구조와 동일합니다.
+빈칸([ ])만 채우세요. 블록 안에는 설명·주석·이모지를 넣지 않습니다.
+대사 라벨은 한/영 컬럼 모두 "대사 — 화자: {대사}" 한 가지로 통일합니다.
+
+===================================================================
+01 SCENE CONTEXT (장면 컨텍스트)
+===================================================================
+[씬번호] Part [파트] — [공간명], [시간대]. [조명/공간 분위기 한 줄]. [총 러닝타임]-second
+sequence. [장면 핵심 요약 한 줄]. Only named cast appears; there are no extras.
+
+===================================================================
+02 ACTIVE REFERENCES (레퍼런스 / 범례)
+===================================================================
+Upload order is the numbering — upload [N] images in the order below, plus audio
+track(s) separately.
+Part-level order — people ([인물 목록]) → backgrounds ([배경 목록]) → props ([소품 목록]).
+
+· @Image1 — [인물1]: face and clothing only. [He/She/They].
+· @Image2 — [인물2]: face and clothing only. [He/She/They].
+· @Image[N] — [배경 이름]: base reference background for this part's space.
+· @Image[N] — [소품 이름]: prop reference only. Never create an actor from this reference.
+
+AUDIO
+@Audio1 — [오디오 내용 설명]. Trimmed to 0-[길이]s.
+
+REFERENCE ROLE LOCK
+@Image1-@Image[N] are character references.
+@Image[N]-@Image[N] are background references.
+@Image[N]-@Image[N] are prop references.
+Do not create actors from background or prop references.
+
+Identity lock — each person's face, hair, and wardrobe follow only their @Image
+reference and never drift between cuts.
+
+===================================================================
+03 LOCATION MAP AND LIGHTING (공간 배치 및 조명)
+===================================================================
+[공간명] — [조명 색온도/텅스텐·형광등·특수광 묘사].
+Depth layers — foreground: [전경 오브젝트]. Mid-ground: [중경 인물/가구]. Background:
+[후경 벽/문/배경].
+The [통로 이름] is this part's main path, open between [좌측 경계] and [우측 경계].
+
+===================================================================
+04 FORMAT MODE / OPTICS / CAMERA (카메라 및 컷 목록)
+===================================================================
+Mode: [multi-cut / single-take]. No drift within the section. One move per cut.
+FOV uses only the 9-step anchor scale (12°/18°/24°/29°/35°/47°/63°/84°/107°는 실제
+프로젝트 표기 기준 180/107/84/63/47/29/18/12/8° 앵커 사용).
+
+CUT[씬-1]: [화각]°, [샷사이즈], [앵글], [무빙] [[시작]-[끝]s] — subject [피사체 또는 "no subject ([소품명])"]
+CUT[씬-2]: [화각]°, [샷사이즈], [앵글], [무빙] [[시작]-[끝]s] — subject [피사체]
+
+===================================================================
+05 PROP AND WARDROBE LOCK (소품 및 의상 락)
+===================================================================
+[소품1] — [재질, 색상, 형태]. Identical form throughout.
+[인물1]'s wardrobe — [의상 묘사], per @Image[N].
+
+===================================================================
+06 PERFORMANCE (퍼포먼스 및 연기 상태)
+===================================================================
+[POSTURE] [인물들] remain [standing/seated] throughout this part.
+· [인물1] — [신체 긴장도·표정·행동 의도].
+· [인물2] — [신체 긴장도·표정·행동 의도].
+
+===================================================================
+07 BACKGROUND CAST (배경 인물 명세)
+===================================================================
+Background cast — none, no extras. Only named characters appear. Never freezes.
+(엑스트라가 있으면: 얼굴 다양성·복장 다양성·지속 행동 루프·정지 금지 4요소를 한·영 양쪽에 기술)
+
+===================================================================
+08 ACTION TIMELINE (초 단위 타임라인) ⭐
+===================================================================
+[시작]s to [끝]s — CUT[씬-1]. FIRST FRAME SPACE — [첫 프레임 피사체 위치·구도]. [액션 문장,
+@Image 첫 등장 시 인라인 호출].
+대사 — [화자]: {[대사 내용]}
+SFX: [효과음]. (있는 컷만)
+
+[시작]s to [끝]s — CUT[씬-2]. FIRST FRAME SPACE — [첫 프레임 피사체 위치·구도]. [액션 문장].
+
+===================================================================
+09 STYLE / OUTPUT SETTINGS (스타일 및 출력)
+===================================================================
+Film look with [카메라 워크 묘사], [텍스처 묘사]. Color temperature [색온도/톤]. Aspect
+ratio 16:9. No BGM — room tone, dialogue, and SFX only. [총길이] seconds total.
+Identity lock — each person's face, hair, and wardrobe follow only their @Image
+reference and never drift between cuts.
+
+===================================================================
+10 POSITIVE LOCKS (포지티브 락 & 잔류 네거티브)
+===================================================================
+· In every cut except inserts, the speaker's face stays large and centered in frame.
+· [동선/공간 유지 조건].
+· Each person is a distinct individual; no face exists twice on screen.
+· [인물들] stay [standing/seated] throughout the part.
+RESIDUAL NEGATIVE — screen artifacts only (최대 3줄)
+No on-screen captions, watermark, or logo.

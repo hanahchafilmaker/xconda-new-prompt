@@ -1,0 +1,54 @@
+{
+  "schema": "xconda-scene-v1",
+  "sceneId": "S8",
+  "title": "레거시 px room 회귀 테스트",
+  "model": "Seedance 2.5",
+
+  "room": {
+    "centerPx": [320, 240],
+    "widthPx": 640,
+    "depthPx": 480,
+    "items": [
+      { "name": "공동 데스크", "x": 240, "y": 200, "w": 64, "h": 32, "angle": 0 }
+    ]
+  },
+
+  "refs": {
+    "characters": [{ "tag": "@Image1", "id": "hyunwoo", "name": "현우" }],
+    "backgrounds": [], "props": [], "audio": [], "video": []
+  },
+
+  "parts": [
+    {
+      "partId": "A",
+      "title": "레거시 파트",
+      "duration": 5.0,
+      "mode": "멀티컷",
+      "appears": ["hyunwoo"],
+      "usesRefs": ["@Image1"],
+      "blocking": {
+        "hyunwoo": { "x": 400, "y": 300, "angle": 180, "pose": "서다", "path": [] }
+      },
+      "cameras": [
+        { "cutRef": "CUT8-1", "x": 400, "y": 420, "target": [400, 300],
+          "fov": 47, "shotSize": "미디엄", "subject": "hyunwoo", "angle": -90 }
+      ],
+      "prompt": {
+        "meta": { "ver": "v1", "level": "LEVEL 2" },
+        "blocks": [
+          { "n": "02", "t": "레퍼런스 / 범례", "tEn": "ACTIVE REFERENCES",
+            "ko": "· @Image1 — 현우", "en": "· @Image1 — Hyunwoo" }
+        ],
+        "cuts": [
+          {
+            "tc": "0-5초",
+            "lb": "CUT8-1 · 미디엄 47°",
+            "dlg": "", "speaker": "", "dlgPlain": "",
+            "ko": "0-5초 — CUT8-1. @Image1 현우가 선 채로 숨을 고른다.",
+            "en": "0-5s — CUT8-1. @Image1 Hyunwoo stands and steadies his breath."
+          }
+        ]
+      }
+    }
+  ]
+}
