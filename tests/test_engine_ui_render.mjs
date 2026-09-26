@@ -51,6 +51,9 @@ check('탭 하나가 선택 상태다', d.getElementById('tabs').querySelector('
 const svgs = d.getElementById('panelGrid').querySelectorAll('svg').length;
 check('컷별 패널 SVG가 그려진다', svgs > 0, `${svgs}개`);
 check('패널 안에 인물 글리프(원)가 있다', d.getElementById('panelGrid').querySelectorAll('circle').length > 0, '원 0개');
+const pos = d.querySelector('.panel-pos');
+check('컷 패널에 첫 프레임 위치가 적힌다', !!pos && pos.textContent.includes('첫 프레임 공간'), pos ? pos.textContent : '없음');
+check('패널 위치가 가구를 자리로 말하지 않는다', !!pos && !/보조대|사물함|책장/.test(pos.textContent), pos ? pos.textContent : '없음');
 
 check('등장인물/레퍼런스 목록이 채워진다', d.getElementById('castList').children.length > 0, '비어 있음');
 
@@ -64,6 +67,10 @@ check('02·08 블록은 펴져 있다', !!blk02 && !blk02.classList.contains('fo
 const cnt = d.getElementById('cnt').textContent;
 check('하단 글자 수가 계산된다', /한글 [\d,]+자/.test(cnt), cnt);
 check('검수 결과가 나온다', d.getElementById('audit').textContent.trim().length > 0, '빈 검수창');
+const en = dom.window.assembleEn();
+check('씨댄스 복사본에 right behind 가 없다', !en.includes('right behind'), 'right behind 잔존');
+check('씨댄스 복사본이 패널과 같은 앞뒤를 말한다', en.includes('frame-center in the foreground') && en.includes('stacked in depth on the same center axis'), en.slice(0, 180));
+check('right behind 를 복사 전에 고친다', !dom.window.seedanceSafe('sitting right behind').includes('right behind') && dom.window.seedanceSafe('at frame-right').includes('frame-right'));
 
 // 파트를 실제로 클릭해서 갈아타지는지도 본다 (이벤트 핸들러가 살아 있는지).
 const tab3 = d.getElementById('tabs').children[2];

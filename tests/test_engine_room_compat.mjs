@@ -55,8 +55,9 @@ eq('레거시에 표식 안 남는다', legacy.room._itemsFrom === undefined, tr
 
 // 5) [프롬프트 복사]가 블록 머리("01 SCENE CONTEXT")를 붙여 조립하는가
 //    — examples/template_10block_prompt.txt 가 약속한 형식. v9.13 이전에 이게 빠져 있었다.
+const safeSrc = html.match(/function seedanceSafe\(t\)\{[\s\S]*?\n\}/)[0];
 const assembleSrc = html.match(/function assemble\(p,L\)\{[\s\S]*?\n\}/)[0];
-const assemble = new Function(`${assembleSrc}\nreturn assemble;`)();
+const assemble = new Function(`${safeSrc}\n${assembleSrc}\nreturn assemble;`)();
 const enPrompt = assemble(scene.parts[0], 'en');
 eq('영문 프롬프트에 01 블록 머리', enPrompt.startsWith('01 SCENE CONTEXT\n'), true);
 eq('블록 머리가 순서대로 들어간다',

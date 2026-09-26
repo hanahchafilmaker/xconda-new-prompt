@@ -142,9 +142,9 @@ PERF = {
 # (ko_lines, en_lines) — 첫 줄은 타임코드, 두 번째 줄 자리에 공간 문장이 들어간다
 CUT_TEXT = {
 "CUT8-1": (["0-5초 — CUT8-1.",
-            "끼이익 소리와 함께 철문이 열리고 {LOC} 낡은 사무실 안이 드러난다. @Image2 방대한이 안쪽 가장 높은 책상 뒤에서 고개를 숙인 채 서류를 읽고 있다. 카메라는 그의 등을 향해 천천히 앞으로 흘러 들어간다. 서류더미가 양옆으로 지나간다."],
+            "끼이익 소리와 함께 철문이 열리고 {LOC} 낡은 사무실 안이 드러난다. @Image1 현우의 등이 프레임 중앙 전경을 채운다. 그 너머 안쪽 가장 높은 책상 뒤 후경에서 @Image2 방대한이 고개를 숙인 채 서류를 읽고 있다. 카메라는 방대한의 등을 향해 천천히 앞으로 흘러 들어간다. 서류더미가 통로를 따라 지나간다."],
            ["0-5s — CUT8-1.",
-            "With a shriek of hinges the iron door opens and {LOC} the old office is revealed. @Image2 Daehan stands behind the tallest desk at the far end, head bent over paperwork. The camera drifts slowly forward toward his back as piles of documents pass on either side."]),
+            "With a shriek of hinges the iron door opens and {LOC} the old office is revealed. @Image1 Hyunwoo's back fills frame-center in the foreground. Beyond him, in the background, @Image2 Daehan stands behind the tallest desk at the far end, head bent over paperwork. The camera drifts slowly forward toward Daehan as piles of documents pass along the aisle."]),
 "CUT8-2": (["5-10초 — CUT8-2.",
             "@Image1 현우가 낡은 사무실 분위기를 둘러보다 헛기침을 하고 @Image2 방대한에게 인사한다. 방대한은 시선을 서류에 고정한 채 입을 연다.",
             "대사 — 방대한: {자네, 디비전 제로 자원했다며.}",
@@ -176,9 +176,9 @@ CUT_TEXT = {
             "Dialogue — Hyunwoo: {...제가 안 끌려간 거랑 관련 있습니까?}",
             "A 0.5s micro-pause from 10s."]),
 "CUT8-6": (["11-18초 — CUT8-6.",
-            "@Image2 방대한이 시선을 다시 서류로 내리며 짧게 답한다. @Image1 현우는 대답을 듣지 못한 채 그 자리에 남는다. 형광등 빛이 두 사람 사이를 가로막는다."],
+            "@Image2 방대한이 시선을 다시 서류로 내리며 짧게 답한다. @Image1 현우는 이 프레임 밖, 통로에 있던 그 자리에 남는다. 형광등 빛이 두 사람 사이를 가로막는다."],
            ["11-18s — CUT8-6.",
-            "@Image2 Daehan drops his eyes back to the paperwork and answers shortly. @Image1 Hyunwoo is left standing without an answer. The fluorescent light cuts between them."]),
+            "@Image2 Daehan drops his eyes back to the paperwork and answers shortly. @Image1 Hyunwoo stays out of this frame, in the aisle where he already stands. The fluorescent light falls between their places."]),
 "CUT8-7": (["0-5.5초 — CUT8-7.",
             "{LOC} 사무실 안, {CAB} 캐비넷 통로 쪽 철제 사물함 문이 열리고 @Image3 박수가 불쑥 나온다. 어깨 위에는 @Image4 깡철이가 점잖게 앉아 있다. @Image1 현우가 놀라 돌아보고, 박수가 웃으며 악수를 청하자 손을 잡고 응한다. @Image2 방대한은 자리에서 그쪽을 본다.",
             "대사 — 박수: {안녕하세요~ 저는 박수라고 해요.}",

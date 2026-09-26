@@ -53,6 +53,10 @@ make engine-html                # 웹에 올릴 편집기 UI(index.html) 재생�
   미터 room을 주면 px 필드를 채우고, 이미 px인 예전 씬은 그대로 통과한다. `portals`(문·창)는
   사람이 지나가는 통로이므로 `items`에 넣지 않는다.
 - 좌표 숫자는 **프롬프트 본문에 절대 쓰지 않는다** — 씨댄스가 숫자를 연출로 오인한다.
+- 씨댄스 영문에 `right behind` · `reading … the height` · `is left standing` · 근거 없는
+  `screen-left and screen-right` 를 쓰지 않는다. 패널은 앞뒤·중앙인데 사람을 옆으로, 또는
+  그 가구 쪽으로 옮긴다. 첫 프레임 공간 줄은 `frame_space_pair`가 만드는
+  **인물 / 프레임 좌·중·우 / 전경·중경·후경** 만.
 
 ## 5. 고치지 말 것
 
