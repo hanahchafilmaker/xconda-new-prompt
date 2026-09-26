@@ -1,0 +1,240 @@
+{
+  "_meta": {
+    "schemaVersion": "xconda-object-catalog-v1",
+    "unit": "meter",
+    "pxPerMeter": 40,
+    "anchor": {
+      "type": "human_height",
+      "value": 1.7,
+      "note": "인간 키 1.70m를 스케일 기준점으로 삼는다. 가구 크기가 애매하면 '사람이 옆에 섰을 때 이 비율인가'로 검산한다. 예: 책상 높이 0.75m ≈ 사람 배꼽, 캐비닛 1.90m ≈ 사람보다 조금 큼, 소파 등받이 0.78m ≈ 앉은 사람 어깨."
+    },
+    "howToUse": "공간 배치 시 이 카탈로그를 불러와 각 가구의 width/depth(m)에 40을 곱해 px 크기(w,h)를 정한다. 위치(x,y)는 평면도에서 읽되, 크기는 여기 표준값을 쓴다. 사람 키(68px = 1.7m)를 화면에 함께 두고 비율을 검산한다."
+  },
+  "objects": {
+    "책상": {
+      "kind": "책상",
+      "catalogKey": "desk",
+      "model": "desk",
+      "width": 1.2,
+      "depth": 0.7,
+      "height": 0.75,
+      "note": "1인 사무 책상. 사람이 앉으면 상판이 배꼽 높이."
+    },
+    "팀장책상": {
+      "kind": "책상",
+      "catalogKey": "desk",
+      "model": "desk",
+      "width": 1.6,
+      "depth": 0.8,
+      "height": 0.75,
+      "note": "팀장/임원용, 일반 책상보다 큼."
+    },
+    "의자": {
+      "kind": "의자",
+      "catalogKey": "chair",
+      "model": "chairDesk",
+      "width": 0.55,
+      "depth": 0.55,
+      "height": 0.92,
+      "note": "사무 회전의자. 등받이 상단이 앉은 사람 어깨~머리."
+    },
+    "소파": {
+      "kind": "소파",
+      "catalogKey": "sofa",
+      "model": "loungeSofa",
+      "width": 2.0,
+      "depth": 0.85,
+      "height": 0.78,
+      "note": "3인 소파. 등받이가 앉은 사람 어깨."
+    },
+    "L자소파_가로": {
+      "kind": "소파",
+      "catalogKey": "sofa",
+      "model": "loungeSofaCorner",
+      "width": 2.6,
+      "depth": 0.9,
+      "height": 0.78,
+      "note": "L자 소파의 긴 가로부."
+    },
+    "L자소파_세로": {
+      "kind": "소파",
+      "catalogKey": "sofa",
+      "model": "loungeSofaCorner",
+      "width": 0.9,
+      "depth": 1.8,
+      "height": 0.78,
+      "note": "L자 소파의 짧은 세로부."
+    },
+    "테이블": {
+      "kind": "테이블",
+      "catalogKey": "table",
+      "model": "tableCoffee",
+      "width": 1.1,
+      "depth": 0.6,
+      "height": 0.45,
+      "note": "거실 로우테이블. 소파 앞."
+    },
+    "유리테이블": {
+      "kind": "테이블",
+      "catalogKey": "table",
+      "model": "tableCoffeeGlass",
+      "width": 1.1,
+      "depth": 0.6,
+      "height": 0.45,
+      "note": "유리 상판 로우테이블."
+    },
+    "책장": {
+      "kind": "책장",
+      "catalogKey": "bookcase",
+      "model": "bookcaseOpen",
+      "width": 0.9,
+      "depth": 0.35,
+      "height": 1.8,
+      "note": "개방형 책장. 사람 키보다 조금 큼."
+    },
+    "서류선반": {
+      "kind": "책장",
+      "catalogKey": "bookcase",
+      "model": "bookcaseOpen",
+      "width": 1.8,
+      "depth": 0.4,
+      "height": 1.9,
+      "note": "벽면 대형 서류 선반. 여러 칸."
+    },
+    "캐비닛": {
+      "kind": "수납장",
+      "catalogKey": "cabinet",
+      "model": "bookcaseClosedDoors",
+      "width": 0.9,
+      "depth": 0.45,
+      "height": 1.9,
+      "note": "문짝 달린 철제 캐비닛. 사람보다 큼."
+    },
+    "로커": {
+      "kind": "수납장",
+      "catalogKey": "cabinet",
+      "model": "bookcaseClosedDoors",
+      "width": 0.6,
+      "depth": 0.5,
+      "height": 1.9,
+      "note": "세로 철제 로커."
+    },
+    "코트랙": {
+      "kind": "코트스탠드",
+      "catalogKey": "coatRack",
+      "model": "coatRackStanding",
+      "width": 0.45,
+      "depth": 0.45,
+      "height": 1.7,
+      "note": "코트걸이. 사람 키와 비슷."
+    },
+    "화분": {
+      "kind": "화분",
+      "catalogKey": "plant",
+      "model": "plantSmall1",
+      "width": 0.4,
+      "depth": 0.4,
+      "height": 0.65,
+      "note": "바닥 화분."
+    },
+    "박스": {
+      "kind": "박스",
+      "catalogKey": "box",
+      "model": "cardboardBoxClosed",
+      "width": 0.45,
+      "depth": 0.45,
+      "height": 0.55,
+      "note": "종이 박스."
+    },
+    "침대": {
+      "kind": "침대",
+      "catalogKey": "bed",
+      "model": "bedSingle",
+      "width": 1.0,
+      "depth": 2.0,
+      "height": 0.55,
+      "note": "싱글 침대."
+    },
+    "모니터": {
+      "kind": "모니터",
+      "catalogKey": "monitor",
+      "model": "computerScreen",
+      "width": 0.55,
+      "depth": 0.2,
+      "height": 0.45,
+      "note": "책상 위 모니터."
+    },
+    "플로어램프": {
+      "kind": "스탠드조명",
+      "catalogKey": "floorLamp",
+      "model": "lampRoundFloor",
+      "width": 0.4,
+      "depth": 0.4,
+      "height": 1.55,
+      "note": "바닥 스탠드 조명."
+    },
+    "문": {
+      "kind": "문",
+      "catalogKey": null,
+      "model": "doorway",
+      "width": 0.9,
+      "depth": 0.1,
+      "height": 2.05,
+      "note": "출입문. 폭 0.9m, 높이 2.05m(사람이 지나가는 표준)."
+    },
+    "창문": {
+      "kind": "창문",
+      "catalogKey": null,
+      "model": "wallWindow",
+      "width": 1.0,
+      "depth": 0.1,
+      "height": 1.2,
+      "note": "일반 창문."
+    },
+    "작은창": {
+      "kind": "창문",
+      "catalogKey": null,
+      "model": "wallWindow",
+      "width": 0.6,
+      "depth": 0.1,
+      "height": 0.6,
+      "note": "작은 격자창."
+    },
+    "전면유리창": {
+      "kind": "전면유리창",
+      "catalogKey": null,
+      "model": "wallWindowSlide",
+      "width": 2.4,
+      "depth": 0.1,
+      "height": 2.0,
+      "note": "큰 전면 유리창."
+    },
+    "코르크보드": {
+      "kind": "책장",
+      "catalogKey": null,
+      "model": null,
+      "width": 1.6,
+      "depth": 0.05,
+      "height": 1.0,
+      "note": "벽걸이 코르크 게시판. 벽에 붙는 얇은 판."
+    },
+    "정수기": {
+      "kind": "책상",
+      "catalogKey": null,
+      "model": null,
+      "width": 0.35,
+      "depth": 0.35,
+      "height": 1.1,
+      "note": "정수기. 세로로 김."
+    },
+    "프린터": {
+      "kind": "책상",
+      "catalogKey": null,
+      "model": null,
+      "width": 0.55,
+      "depth": 0.55,
+      "height": 0.6,
+      "note": "복합기/프린터."
+    }
+  }
+}

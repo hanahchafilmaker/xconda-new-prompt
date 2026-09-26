@@ -1,0 +1,81 @@
+{
+  "schema": "xconda-scene-v1",
+  "sceneId": "S99",
+  "title": "호환 테스트 — 야간 사무실",
+  "model": "Seedance 2.5",
+
+  "room": {
+    "id": "office_99",
+    "kind": "사무실",
+    "name": "9층 사무실",
+    "center": [0.0, 0.0],
+    "width": 8.0,
+    "depth": 6.0,
+    "height": 2.7,
+    "obstacles": [
+      { "id": "desk_a", "name": "공동 데스크", "kind": "furniture",
+        "center": [-1.0, -1.0], "width": 1.6, "depth": 0.8, "hdg": 0, "blocksSight": false },
+      { "id": "shelf_n", "name": "북측 책장", "kind": "furniture",
+        "center": [0.0, -2.6], "width": 3.0, "depth": 0.4, "hdg": 0, "blocksSight": true }
+    ],
+    "portals": [
+      { "id": "door_e", "kind": "doorway", "center": [3.9, 0.0], "width": 0.9, "hdg": 0, "state": "open" }
+    ]
+  },
+
+  "refs": {
+    "characters": [
+      { "tag": "@Image1", "id": "hyunwoo", "name": "현우" },
+      { "tag": "@Image2", "id": "daehan", "name": "방대한" }
+    ],
+    "backgrounds": [],
+    "props": [],
+    "audio": [],
+    "video": []
+  },
+
+  "parts": [
+    {
+      "partId": "A",
+      "title": "호환 테스트 파트",
+      "duration": 8.0,
+      "mode": "멀티컷",
+      "appears": ["hyunwoo", "daehan"],
+      "usesRefs": ["@Image1", "@Image2"],
+
+      "blocking": {
+        "hyunwoo": { "x": 40, "y": 20, "angle": 180, "pose": "서다", "path": [] },
+        "daehan": { "x": -40, "y": 60, "angle": 0, "pose": "서다", "path": [] }
+      },
+
+      "cameras": [
+        { "cutRef": "CUT99-1", "x": 0, "y": 100, "target": [40, 20],
+          "fov": 47, "shotSize": "미디엄", "subject": "hyunwoo", "angle": -63 }
+      ],
+
+      "prompt": {
+        "meta": { "ver": "v1", "level": "LEVEL 2" },
+        "blocks": [
+          { "n": "01", "t": "장면 컨텍스트", "tEn": "SCENE CONTEXT", "ko": "야근 중인 사무실.", "en": "An office late at night." },
+          { "n": "02", "t": "레퍼런스 / 범례", "tEn": "ACTIVE REFERENCES",
+            "ko": "· @Image1 — 현우\n· @Image2 — 방대한",
+            "en": "· @Image1 — Hyunwoo\n· @Image2 — Daehan" },
+          { "n": "08", "t": "초 단위 타임라인", "tEn": "ACTION TIMELINE", "cuts": true,
+            "headKo": "[초 단위 타임라인]", "headEn": "[ACTION TIMELINE]" },
+          { "n": "10", "t": "포지티브 락", "tEn": "POSITIVE LOCKS", "ko": "조명은 유지된다.", "en": "The lighting holds." }
+        ],
+        "cuts": [
+          {
+            "tc": "0-8초",
+            "lb": "CUT99-1 · 미디엄 47°",
+            "dlg": "",
+            "speaker": "",
+            "dlgPlain": "",
+            "ko": "0-8초 — CUT99-1. @Image1 현우가 데스크 앞에서 고개를 든다. @Image2 방대한은 뒤쪽에 서 있다.",
+            "en": "0-8s — CUT99-1. @Image1 Hyunwoo lifts his head at the desk. @Image2 Daehan stands behind him."
+          }
+        ]
+      }
+    }
+  ]
+}

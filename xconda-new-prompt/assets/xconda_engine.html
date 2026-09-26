@@ -1,0 +1,401 @@
+<meta charset="utf-8">
+<title>XCONDA ENGINE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0A0A0A;--panel:#121212;--panel2:#1A1A1A;--rule:#2A2A2A;--rule2:#3A3A3A;
+--ink:#F2F2F0;--dim:#8C8C88;--dim2:#5E5E5A;--y:#FFC800;--y-dim:#8A6E00;--warn:#FF5C3D;--ok:#8FAE6B;
+--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;--kr:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif}
+body{background:var(--bg);color:var(--ink);font-family:var(--kr);font-size:14px;line-height:1.6;padding:0 0 90px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 22px}
+.head{display:flex;align-items:center;gap:0 16px;flex-wrap:wrap;padding:18px 0 12px;border-bottom:2px solid var(--y)}
+.head .brand{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;color:var(--dim2);width:100%;margin-bottom:5px}
+.head .slug{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--y)}
+.head .meta{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.head .meta b{color:var(--ink)}
+/* 드롭존 */
+#drop{border:2px dashed var(--rule);background:var(--panel);border-radius:8px;padding:70px 20px;text-align:center;color:var(--dim);cursor:pointer;margin:22px 0}
+#drop.over{border-color:var(--y);background:#1a1710;color:var(--ink)}
+#drop b{color:var(--y)} #drop .sub{font-size:12px;color:var(--dim2);margin-top:8px}
+/* 파트 탭 */
+.tabs{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap}
+.tab{border:1px solid var(--rule);background:var(--panel);color:var(--dim);padding:7px 16px;cursor:pointer;font-family:var(--kr);font-size:13px;border-radius:4px}
+.tab.on{border-color:var(--y);color:var(--y);background:var(--panel2);font-weight:700}
+.tab .dur{font-family:var(--mono);font-size:10px;color:var(--dim2);margin-left:6px}
+/* 레이아웃 */
+.stage{display:none} .stage.on{display:block}
+.sec{border:1px solid var(--rule);background:var(--panel);margin-top:14px}
+.sec-h{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--panel2);border-left:3px solid var(--y);cursor:pointer}
+.sec-h .n{font-family:var(--mono);font-size:11px;color:var(--y);font-weight:700}
+.sec-h .t{font-size:13px;font-weight:700}
+.sec-h .hint{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--dim2)}
+.sec.fold .body{display:none}
+.board-grid{display:grid;grid-template-columns:340px 1fr;gap:16px;padding:14px}
+.cast-list{display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto}
+.cast-item{border:1px solid var(--rule);padding:8px 10px;border-radius:4px;font-size:12px}
+.cast-item .cn{font-weight:700} .cast-item .cr{color:var(--dim);font-size:11px}
+.cast-item .cw{color:var(--dim2);font-size:10.5px;font-family:var(--mono);margin-top:2px}
+.cast-item.off{opacity:.38}
+.ref-grp{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--y-dim);margin:10px 0 4px;text-transform:uppercase}
+.rtag{font-family:var(--mono);font-size:10px;color:var(--y);font-weight:700}
+.ron{font-family:var(--mono);font-size:9.5px;color:var(--ok)}
+.reflink{margin-top:6px}
+/* 컷별 패널 */
+.panel-title{font-size:12px;font-weight:700;margin:0 0 8px;color:var(--dim)}
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.panel-card{border:1px solid var(--rule);background:var(--panel2);padding:6px}
+.panel-svg{background:#fff;border:1px solid var(--rule2)}
+.panel-svg svg{display:block;width:100%;height:auto}
+.panel-lb{font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-top:5px;text-align:center}
+/* 프롬프트 블록 */
+.blk{border:1px solid var(--rule);background:var(--panel);margin-top:12px}
+.blk-h{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--panel2);cursor:pointer;border-left:3px solid var(--y)}
+.blk-h .bn{font-family:var(--mono);font-size:10px;color:var(--y)}
+.blk-h .bt{font-size:12.5px;font-weight:700}
+.blk-h .car{margin-left:auto;font-size:9px;color:var(--dim2)}
+.blk.fold .car{transform:rotate(-90deg)} .blk.fold .body{display:none}
+.pane{background:var(--panel)}
+.pane textarea{width:100%;background:#0d0d0d;border:0;border-top:1px solid var(--rule);color:var(--ink);
+font-family:var(--mono);font-size:12px;line-height:1.8;padding:8px 14px;resize:vertical;outline:none}
+.pane textarea:focus{background:#151515}
+.cut-h{padding:7px 14px;background:#151510;font-family:var(--mono);font-size:11px;color:var(--y-dim);border-top:1px solid var(--rule)}
+.cut-h .dlg{color:var(--y);margin-left:8px}
+/* 검수 */
+.audit{border:1px solid var(--rule);background:var(--panel);margin-top:14px;padding:10px 14px}
+.audit .li{display:flex;gap:8px;font-size:12px;padding:3px 0;color:var(--warn)}
+.audit .li.ok{color:var(--dim)}
+/* 푸터 */
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(12,12,12,.96);border-top:1px solid var(--rule);backdrop-filter:blur(8px);z-index:20}
+.bar-in{max-width:1240px;margin:0 auto;padding:12px 22px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--rule);background:var(--panel2);color:var(--ink);padding:8px 15px;font-family:var(--kr);font-size:12.5px;cursor:pointer;border-radius:4px}
+.btn:hover{border-color:var(--y);color:var(--y)}
+.btn.pri{background:var(--y);color:#0A0A0A;border-color:var(--y);font-weight:700}
+.btn.sm{padding:4px 10px;font-size:11.5px}
+.hint2{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--dim2)}
+.toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--y);color:#0A0A0A;padding:9px 20px;font-size:12.5px;font-weight:700;border-radius:4px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:900px){.board-grid{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+  <div class="head">
+    <span class="brand">XCONDA ENGINE · SCENE-V1 · KO</span>
+    <span class="slug" id="hSlug">XCONDA ENGINE</span>
+    <span class="meta" id="hMeta">씬 JSON을 드롭하세요</span>
+  </div>
+
+  <div id="drop">
+    <div><b>씬 데이터 JSON</b>을 여기에 끌어다 놓거나 클릭해서 선택하세요</div>
+    <div class="sub">scene_*.json · xconda-scene-v1 형식</div>
+    <input type="file" id="fileInput" accept=".json" style="display:none">
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="stage" id="stage">
+    <!-- 등장인물/레퍼런스 + 컷별 패널 -->
+    <div class="sec" id="secBoard">
+      <div class="sec-h" onclick="this.parentElement.classList.toggle('fold')"><span class="n">BOARD</span><span class="t">등장인물 · 컷별 패널</span><span class="hint">사진 없음 · 선 도면만</span></div>
+      <div class="body board-grid">
+        <div>
+          <div class="sec-h" style="border:0;background:none;padding:0 0 8px"><span class="t" style="font-size:12px">등장인물 / 레퍼런스</span></div>
+          <div class="cast-list" id="castList"></div>
+        </div>
+        <div>
+          <div class="panel-title">컷별 패널 — 카메라 프레이밍 · 인물 위치</div>
+          <div class="panel-grid" id="panelGrid"></div>
+        </div>
+      </div>
+    </div>
+    <!-- 프롬프트 -->
+    <div class="sec" id="secPrompt">
+      <div class="sec-h" onclick="this.parentElement.classList.toggle('fold')"><span class="n">PROMPT</span><span class="t">프롬프트 (한국어)</span><span class="hint">고치면 복사에 바로 반영</span></div>
+      <div class="body" id="promptBody" style="padding:12px"></div>
+    </div>
+    <!-- 검수 -->
+    <div class="audit" id="audit"></div>
+  </div>
+</div>
+<div class="bar"><div class="bar-in">
+  <button class="btn pri" onclick="copyEn()">영문 프롬프트 복사 (씨댄스용)</button>
+  <button class="btn" onclick="copyKoForClaude()">한국어만 복사 → Claude</button>
+  <span class="hint2" id="cnt"></span>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+let SCENE=null, PART=null;   // 현재 씬 데이터, 현재 파트 id
+
+/* ── 드롭 ── */
+const drop=document.getElementById('drop'), fi=document.getElementById('fileInput');
+drop.onclick=()=>fi.click();
+fi.onchange=e=>{if(e.target.files[0])readFile(e.target.files[0])};
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)readFile(f)});
+function readFile(file){const r=new FileReader();r.onload=()=>{try{loadScene(JSON.parse(r.result))}catch(e){toast('JSON 파싱 실패: '+e.message)}};r.readAsText(file)}
+
+/* __ROOM_COMPAT_START__ — v9.13: scene-v1의 미터 room(center/width/depth/obstacles)을
+   도구가 읽는 px 필드(centerPx/widthPx/depthPx/items, 40px=1m)로 채운다.
+   assets/scene_compat.py와 같은 규칙. 이미 room.items가 있는 예전 씬은 무변환 통과.
+   portals(문·창)는 통로이므로 items에 넣지 않는다. */
+const PX_PER_M=40;
+function roomPx(v){ return Math.round((Number(v)||0)*PX_PER_M*1000)/1000; }
+function normalizeRoom(data){
+  const room=data&&data.room;
+  if(!room||room.items) return data;
+  const c=room.center||[0,0];
+  room.centerPx=[roomPx(c[0]),roomPx(c.length>1?c[1]:0)];
+  room.widthPx=roomPx(room.width);
+  room.depthPx=roomPx(room.depth);
+  room.items=(room.obstacles||[]).map(function(o){
+    const oc=o.center||[0,0];
+    return {id:o.id,name:o.name||o.id||o.kind||'obstacle',kind:o.kind||'furniture',
+            x:roomPx(oc[0]),y:roomPx(oc.length>1?oc[1]:0),
+            w:roomPx(o.width),h:roomPx(o.depth!=null?o.depth:o.height),
+            angle:(o.hdg!=null?o.hdg:(o.angle||0)),blocksSight:!!o.blocksSight};
+  });
+  room._itemsFrom='obstacles@40px/m(portals 제외)';
+  return data;
+}
+/* __ROOM_COMPAT_END__ */
+
+/* ── 씬 로드 ── */
+function loadScene(data){
+  if(data.schema!=='xconda-scene-v1'){ toast('scene-v1 형식이 아닙니다'); return; }
+  normalizeRoom(data);
+  SCENE=data;
+  document.getElementById('hSlug').textContent=data.sceneId+' · '+(data.title||'');
+  document.getElementById('hMeta').textContent=(data.model||'')+' · 파트 '+(data.parts||[]).length+'개';
+  document.getElementById('drop').style.display='none';
+  document.getElementById('stage').classList.add('on');
+  buildTabs();
+  selectPart((data.parts[0]||{}).partId);
+  toast('씬을 불러왔습니다');
+}
+function buildTabs(){
+  const t=document.getElementById('tabs'); t.innerHTML='';
+  (SCENE.parts||[]).forEach(p=>{
+    const b=document.createElement('div'); b.className='tab'; b.dataset.pid=p.partId;
+    b.innerHTML=p.partId+' <span class="dur">'+(p.title||'')+' · '+(p.duration||'?')+'s</span>';
+    b.onclick=()=>selectPart(p.partId); t.appendChild(b);
+  });
+}
+function curPart(){ return (SCENE.parts||[]).find(p=>p.partId===PART); }
+function selectPart(pid){
+  PART=pid;
+  [...document.getElementById('tabs').children].forEach(b=>b.classList.toggle('on',b.dataset.pid===pid));
+  renderPanels(); renderCast(); renderPrompt(); audit();
+}
+
+/* ── 컷별 패널 — 흰 바탕·검은 선 기술도면. 이 컷의 카메라 프레이밍 + 인물 위치만 ── */
+function panelGeom(){
+  const room=SCENE.room, W=214,Hc=140,pad=12;
+  const rw=room.widthPx, rh=room.depthPx, cx=room.centerPx[0], cy=room.centerPx[1];
+  const sc=Math.min((W-pad*2)/rw,(Hc-pad*2)/rh);
+  const ox=(W-rw*sc)/2-(cx-rw/2)*sc, oy=(Hc-rh*sc)/2-(cy-rh/2)*sc;
+  return {W:W,Hc:Hc,rw:rw,rh:rh,cx:cx,cy:cy,sc:sc,ox:ox,oy:oy,
+          TX:function(x){return +(ox+x*sc).toFixed(1)}, TY:function(y){return +(oy+y*sc).toFixed(1)}};
+}
+/* 인물 아이콘 — 얼굴 이목구비 없이 머리(원)+자세선만. bold=이 컷의 주 피사체 */
+function actorGlyph(x,y,pose,bold){
+  const r=4, sw=bold?1.7:1.1, fill=bold?'#000':'#fff';
+  let body='';
+  if(pose==='앉다'){
+    body='<line x1="'+x+'" y1="'+(y+r)+'" x2="'+x+'" y2="'+(y+r+5)+'" stroke="#000" stroke-width="'+sw+'"/>'+
+         '<line x1="'+(x-5)+'" y1="'+(y+r+5)+'" x2="'+(x+5)+'" y2="'+(y+r+5)+'" stroke="#000" stroke-width="'+sw+'"/>';
+  } else if(pose==='눕다'){
+    body='<line x1="'+(x-9)+'" y1="'+(y+r+2)+'" x2="'+(x+9)+'" y2="'+(y+r+2)+'" stroke="#000" stroke-width="'+sw+'"/>';
+  } else if(pose==='무릎꿇다'){
+    body='<line x1="'+x+'" y1="'+(y+r)+'" x2="'+x+'" y2="'+(y+r+6)+'" stroke="#000" stroke-width="'+sw+'"/>'+
+         '<line x1="'+x+'" y1="'+(y+r+6)+'" x2="'+(x-4)+'" y2="'+(y+r+9)+'" stroke="#000" stroke-width="'+sw+'"/>';
+  } else {
+    body='<line x1="'+x+'" y1="'+(y+r)+'" x2="'+x+'" y2="'+(y+r+9)+'" stroke="#000" stroke-width="'+sw+'"/>';
+  }
+  return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+fill+'" stroke="#000" stroke-width="'+sw+'"/>'+body;
+}
+function buildCutPanel(cam){
+  const room=SCENE.room, p=curPart(), g=panelGeom(), TX=g.TX, TY=g.TY, sc=g.sc;
+  let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+g.W+' '+g.Hc+'">';
+  s+='<rect width="'+g.W+'" height="'+g.Hc+'" fill="#ffffff"/>';
+  const bx=TX(g.cx-g.rw/2), by=TY(g.cy-g.rh/2), bw=(g.rw*sc).toFixed(1), bh=(g.rh*sc).toFixed(1);
+  s+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" fill="none" stroke="#000" stroke-width="1"/>';
+  (room.items||[]).forEach(function(it){
+    const x=TX(it.x-it.w/2), y=TY(it.y-it.h/2), w=(it.w*sc).toFixed(1), h=(it.h*sc).toFixed(1), cx2=TX(it.x), cy2=TY(it.y);
+    s+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="none" stroke="#bbb" stroke-width="0.6" transform="rotate('+(it.angle||0)+' '+cx2+' '+cy2+')"/>';
+  });
+  if(cam){
+    const a=(cam.angle||0)*Math.PI/180, fov=(cam.fov||47)*Math.PI/180, L=g.W*0.22;
+    const x=TX(cam.x), y=TY(cam.y);
+    s+='<path d="M'+x+','+y+' L'+(x+Math.cos(a-fov/2)*L).toFixed(1)+','+(y+Math.sin(a-fov/2)*L).toFixed(1)+
+       ' A'+L+','+L+' 0 0 1 '+(x+Math.cos(a+fov/2)*L).toFixed(1)+','+(y+Math.sin(a+fov/2)*L).toFixed(1)+' Z" fill="none" stroke="#000" stroke-width="1.2"/>';
+    s+='<polygon points="'+x+','+(y-5)+' '+(x-4)+','+(y+4)+' '+(x+4)+','+(y+4)+'" fill="#000"/>';
+  }
+  if(p) (p.appears||[]).forEach(function(cid){
+    const bl=(p.blocking||{})[cid]; if(!bl)return;
+    const isSubject = !!(cam && cam.subject===cid);
+    s+=actorGlyph(TX(bl.x),TY(bl.y),normalizePose(bl.pose),isSubject);
+  });
+  s+='</svg>'; return s;
+}
+function renderPanels(){
+  const el=document.getElementById('panelGrid'); if(!el)return;
+  const p=curPart(); if(!p){ el.innerHTML=''; return; }
+  const cams=p.cameras||[];
+  el.innerHTML = cams.length
+    ? cams.map(function(cam){
+        return '<div class="panel-card"><div class="panel-svg">'+buildCutPanel(cam)+'</div>'+
+          '<div class="panel-lb">'+esc(cam.cutRef||'')+' · '+esc(cam.shotSize||'')+' '+(cam.fov||'')+'°</div></div>';
+      }).join('')
+    : '<div style="color:#888;font-size:11px;padding:8px">이 파트에 카메라 컷이 없습니다.</div>';
+}
+
+/* ── 레퍼런스 이미지 생성 프롬프트 (인물/배경/소품) ── */
+function refPromptForCharacter(c){
+  return 'Head-and-shoulders studio reference portrait of \u3010role/age range/gender \u2014 '+(c.role||'unspecified')+'\u3011, neutral mood.\n'+
+'Standing upright, front-facing, relaxed neutral pose, \u3010hand/arm position \u2014 unspecified\u3011. Calm neutral expression,\n'+
+'eyes open looking directly into the camera, mouth relaxed and closed. Clearly defined,\n'+
+'consistent identity features: \u3010face shape\u3011 \u00b7 \u3010skin texture\u3011 \u00b7 \u3010hair, swept back off the face\u3011. Wardrobe: '+(c.wardrobe||'\u3010wardrobe unspecified\u3011')+'.\n'+
+'Soft even frontal studio lighting, no harsh shadows, neutral seamless gray background.\n'+
+'Eye-level camera, ~50mm lens, sharp focus on the face, head-and-shoulders in frame,\n'+
+'photorealistic, high detail. No dramatic side lighting, no extreme angle, no motion blur, no props,\n'+
+'face never cropped or covered.';
+}
+function refPromptForBackground(b){
+  return 'Photorealistic on-location reference photo of '+(b.name||'\u3010location/angle name\u3011')+'.\n'+
+'Eye-level documentary framing, natural ambient lighting consistent with the scene, no people in frame,\n'+
+'no motion blur, sharp focus throughout, high detail, neutral color grading (not stylized).\n'+
+'\u3010camera distance/angle \u2014 unspecified, match the real location\u3011.';
+}
+function refPromptForProp(p){
+  return 'Studio product reference photo of '+(p.name||'\u3010prop name\u3011')+(p.note?' \u2014 '+p.note:'')+'.\n'+
+'Plain neutral seamless background, soft even studio lighting, no harsh shadows, sharp focus on\n'+
+'material and form, no hands, no other props in frame, high detail, photorealistic.';
+}
+function findRef(tag){
+  const r=SCENE.refs||{};
+  return [].concat(r.characters||[],r.backgrounds||[],r.props||[],r.audio||[],r.video||[]).find(function(x){return x.tag===tag});
+}
+function copyRefPrompt(kind,tag){
+  const item=findRef(tag); if(!item){toast('레퍼런스를 찾을 수 없습니다');return;}
+  let txt='';
+  if(kind==='char') txt=refPromptForCharacter(item);
+  else if(kind==='bg') txt=refPromptForBackground(item);
+  else if(kind==='prop') txt=refPromptForProp(item);
+  else { toast('이 항목은 레퍼런스 프롬프트 대상이 아닙니다'); return; }
+  cp(txt,'레퍼런스 이미지 생성 프롬프트 복사됨 ('+tag+')');
+}
+
+/* ── 등장인물/레퍼런스 목록 ── */
+function renderCast(){
+  const el=document.getElementById('castList'); if(!el)return; const p=curPart();
+  const uses=(p&&p.usesRefs)||[];
+  const grp=function(kind,title,arr){
+    if(!arr||!arr.length)return '';
+    const canPrompt=(kind==='char'||kind==='bg'||kind==='prop');
+    return '<div class="ref-grp">'+title+'</div>'+arr.map(function(c){
+      const on=uses.includes(c.tag);
+      return '<div class="cast-item'+(on?'':' off')+'"><span class="rtag">'+esc(c.tag)+'</span> <span class="cn" style="color:'+(c.color||'#ccc')+'">'+esc(c.name)+'</span>'+
+        (c.role?' <span class="cr">'+esc(c.role)+'</span>':'')+(on?' <span class="ron">✓ 사용</span>':' <span class="cr">미사용</span>')+
+        (c.wardrobe?'<div class="cw">'+esc(c.wardrobe)+'</div>':'')+(c.refImage?'<div class="cw">'+esc(c.refImage)+'</div>':'')+
+        (canPrompt?'<div class="reflink"><button class="btn sm" onclick="copyRefPrompt(\''+kind+'\',\''+esc(c.tag).replace(/'/g,"\\'")+'\')">📋 레퍼런스 프롬프트 복사</button></div>':'')+
+        '</div>';
+    }).join('');
+  };
+  const r=SCENE.refs||{};
+  el.innerHTML=grp('char','인물',r.characters)+grp('bg','배경',r.backgrounds)+grp('prop','소품',r.props)+grp('audio','오디오',r.audio)+grp('video','영상',r.video)
+    || '<div style="color:var(--dim);padding:10px">레퍼런스 없음</div>';
+}
+
+/* ── 프롬프트 (파트별 blocks/cuts) ── */
+function renderPrompt(){
+  const body=document.getElementById('promptBody'); if(!body)return; body.innerHTML='';
+  const p=curPart(); if(!p||!p.prompt){ body.innerHTML='<div style="color:var(--dim);padding:20px">이 파트에 프롬프트 데이터가 없습니다.</div>'; return; }
+  const blocks=p.prompt.blocks||[];
+  blocks.forEach((b,i)=>{
+    const w=document.createElement('div'); w.className='blk'+(b.n!=='02'&&b.n!=='08'?' fold':'');
+    let inner='<div class="blk-h" onclick="this.parentElement.classList.toggle(\'fold\')"><span class="bn">'+(b.n||'')+'</span><span class="bt">'+esc(b.t||'')+'</span><span class="car">▾</span></div><div class="body">';
+    if(b.cuts){
+      inner+='<div class="pane"><textarea rows="2" data-part="'+p.partId+'" data-blk="'+i+'" data-k="headKo">'+esc(b.headKo||'')+'</textarea></div>';
+      (p.prompt.cuts||[]).forEach((c,j)=>{
+        inner+='<div class="cut-h">'+esc(c.tc||'')+' · '+esc(c.lb||'')+(c.dlg?'<span class="dlg">💬 '+esc(c.dlg)+'</span>':'')+'</div>';
+        inner+='<div class="pane"><textarea rows="4" data-part="'+p.partId+'" data-cut="'+j+'" data-k="ko">'+esc(c.ko||'')+'</textarea></div>';
+      });
+    } else {
+      inner+='<div class="pane"><textarea rows="4" data-part="'+p.partId+'" data-blk="'+i+'" data-k="ko">'+esc(b.ko||'')+'</textarea></div>';
+    }
+    inner+='</div>'; w.innerHTML=inner; body.appendChild(w);
+  });
+  body.querySelectorAll('textarea').forEach(t=>{
+    t.addEventListener('input',()=>{
+      const p=curPart();
+      if(t.dataset.cut!==undefined) p.prompt.cuts[+t.dataset.cut][t.dataset.k]=t.value;
+      else p.prompt.blocks[+t.dataset.blk][t.dataset.k]=t.value;
+      audit();
+    });
+  });
+}
+
+/* ── 조립·복사 (프롬프트 텍스트만) ── */
+function assembleKo(){ const p=curPart(); if(!p||!p.prompt)return ''; return assemble(p,'ko'); }
+function assembleEn(){ const p=curPart(); if(!p||!p.prompt)return ''; return assemble(p,'en'); }
+/* 블록 머리("01 SCENE CONTEXT")를 붙여 조립한다 — examples/template_10block_prompt.txt 가
+   약속한 형식과 같게. v9.13 이전에는 머리가 빠져서 씨댄스에 라벨 없는 10문단이 붙여넣어졌다. */
+function assemble(p,L){
+  return (p.prompt.blocks||[]).map(b=>{
+    const t=((L==='ko'?b.t:b.tEn)||'').trim();
+    const head=((b.n?b.n+' ':'')+t).trim();
+    if(b.cuts){
+      const h=(L==='ko'?b.headKo:b.headEn)||'';
+      const cuts=(p.prompt.cuts||[]).map(c=>((L==='ko'?c.ko:c.en)||'').trim()).join('\n\n');
+      return (head?head+'\n':'')+h+'\n\n'+cuts;
+    }
+    const body=((L==='ko'?b.ko:b.en)||'').trim();
+    return head? head+'\n'+body : body;
+  }).join('\n\n');
+}
+function copyEn(){ cp(assembleEn(),'영문 프롬프트 복사됨 (씨댄스용)'); }
+function copyKoForClaude(){ cp('엑스콘다 '+SCENE.sceneId+' Part '+PART+' 한국어를 고쳤습니다. 영문 맞춰 새로 만들어주세요.\n\n'+assembleKo(),'한국어 복사됨 → 대화창에'); }
+
+
+/* ── 자세(pose) 파서 v1 ── */
+
+var POSE_STAND = '서다', POSE_SIT = '앉다', POSE_LIE = '눕다', POSE_KNEEL = '무릎꿇다';
+
+/* ① 값 정규화 — 씬 JSON이 "sit"으로 와도 보드는 "앉다"로 받는다 */
+var POSE_ALIAS = {
+  'sit': POSE_SIT, 'sits': POSE_SIT, 'sitting': POSE_SIT, 'seated': POSE_SIT, 'sat': POSE_SIT,
+  'perch': POSE_SIT, 'perched': POSE_SIT, '착석': POSE_SIT, '앉음': POSE_SIT, '앉다': POSE_SIT, '앉아': POSE_SIT,
+  'stand': POSE_STAND, 'stands': POSE_STAND, 'standing': POSE_STAND, 'stood': POSE_STAND,
+  'idle': POSE_STAND, '기립': POSE_STAND, '서다': POSE_STAND, '서': POSE_STAND, '섬': POSE_STAND,
+  'lie': POSE_LIE, 'lying': POSE_LIE, 'lies': POSE_LIE, 'prone': POSE_LIE, '눕다': POSE_LIE, '누움': POSE_LIE,
+  'kneel': POSE_KNEEL, 'kneeling': POSE_KNEEL, '무릎꿇다': POSE_KNEEL
+};
+function normalizePose(v, fallback) {
+  if (v == null) return fallback || POSE_STAND;
+  var k = String(v).trim().toLowerCase();
+  return POSE_ALIAS[k] || POSE_ALIAS[String(v).trim()] || fallback || POSE_STAND;
+}
+
+/* ── 검수 (파트 프롬프트) ── */
+function audit(){
+  const el=document.getElementById('audit'); if(!el)return; const p=curPart(); const out=[];
+  if(p&&p.prompt){
+    const ko=assembleKo();
+    const fovs=[...ko.matchAll(/(\d+)\s*°/g)].map(m=>+m[1]);
+    const FOK=[180,107,84,63,47,29,18,12,8];
+    const bad=[...new Set(fovs.filter(f=>!FOK.includes(f)))];
+    if(bad.length) out.push('앵커 밖 화각: '+bad.join('° · ')+'° → 9단계에서 고르세요');
+    const gore=/선홍색\s*피|새빨간\s*피|피가\s*뿜|bright red blood/i;
+    if(gore.test(ko)) out.push('만화적 유혈 어휘 → 검붉은 액체로');
+    document.getElementById('cnt').textContent='한글 '+ko.length.toLocaleString()+'자 · 파트 '+PART;
+  }
+  el.innerHTML = out.length ? out.map(o=>'<div class="li">! '+o+'</div>').join('') : '<div class="li ok">✓ 확인할 것 없음</div>';
+}
+
+/* ── 유틸 ── */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function cp(t,m){const f=()=>{const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity=0;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove();toast(m)};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(()=>toast(m)).catch(f)}else f()}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),1800)}
+
+/* ── EMBEDDED_SCENE 자동 로드 (있으면) ── */
+const EMBEDDED_SCENE = {};
+(function autoload(){ if(EMBEDDED_SCENE && EMBEDDED_SCENE.schema){ loadScene(EMBEDDED_SCENE); } })();
+</script>
