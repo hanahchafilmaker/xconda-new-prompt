@@ -46,6 +46,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--kr);font-size:14px;
 .panel-svg{background:#fff;border:1px solid var(--rule2)}
 .panel-svg svg{display:block;width:100%;height:auto}
 .panel-lb{font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-top:5px;text-align:center}
+.panel-pos{font-size:10.5px;line-height:1.45;color:var(--ink);margin-top:4px;text-align:left}
 /* 프롬프트 블록 */
 .blk{border:1px solid var(--rule);background:var(--panel);margin-top:12px}
 .blk-h{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--panel2);cursor:pointer;border-left:3px solid var(--y)}
@@ -235,14 +236,25 @@ function buildCutPanel(cam){
   });
   s+='</svg>'; return s;
 }
+/* 컷 카드에 적는 위치 = 프롬프트 첫 프레임 줄. 씨댄스 복사본의 영문과 같은 좌표에서 나온다. */
+function spatialKoFor(cam){
+  const p=curPart(); if(!p||!cam) return '';
+  const cut=((p.prompt||{}).cuts||[]).find(function(c){
+    return (c.lb||'').split(' · ')[0].trim()===cam.cutRef;
+  });
+  if(!cut||!cut.ko) return '';
+  return (cut.ko.split('\n').find(function(l){return l.indexOf('첫 프레임 공간')===0;})||'');
+}
 function renderPanels(){
   const el=document.getElementById('panelGrid'); if(!el)return;
   const p=curPart(); if(!p){ el.innerHTML=''; return; }
   const cams=p.cameras||[];
   el.innerHTML = cams.length
     ? cams.map(function(cam){
+        const pos=spatialKoFor(cam);
         return '<div class="panel-card"><div class="panel-svg">'+buildCutPanel(cam)+'</div>'+
-          '<div class="panel-lb">'+esc(cam.cutRef||'')+' · '+esc(cam.shotSize||'')+' '+(cam.fov||'')+'°</div></div>';
+          '<div class="panel-lb">'+esc(cam.cutRef||'')+' · '+esc(cam.shotSize||'')+' '+(cam.fov||'')+'°</div>'+
+          (pos?'<div class="panel-pos">'+esc(pos)+'</div>':'')+'</div>';
       }).join('')
     : '<div style="color:#888;font-size:11px;padding:8px">이 파트에 카메라 컷이 없습니다.</div>';
 }
@@ -338,8 +350,18 @@ function assembleKo(){ const p=curPart(); if(!p||!p.prompt)return ''; return ass
 function assembleEn(){ const p=curPart(); if(!p||!p.prompt)return ''; return assemble(p,'en'); }
 /* 블록 머리("01 SCENE CONTEXT")를 붙여 조립한다 — examples/template_10block_prompt.txt 가
    약속한 형식과 같게. v9.13 이전에는 머리가 빠져서 씨댄스에 라벨 없는 10문단이 붙여넣어졌다. */
+/* 씨댄스는 right/left 를 화면 방향으로 읽는다.
+   "right behind"(바로 뒤) → 화면 오른쪽, "is left standing"(그 자리에 남음) → 화면 왼쪽,
+   "reading ... the height"(작게 보임) → 책상으로 가서 읽기. 패널 위치를 복사 직전에 지킨다.
+   frame-left / frame-right 는 패널이 실제로 좌우로 갈랐을 때만 나오므로 건드리지 않는다. */
+function seedanceSafe(t){
+  return String(t||'')
+    .replace(/\bright behind\b/gi,'directly behind')
+    .replace(/\bis left standing\b/gi,'stays standing')
+    .replace(/;\s*reading (about half|under a third of) the height/gi,'; at $1 the height');
+}
 function assemble(p,L){
-  return (p.prompt.blocks||[]).map(b=>{
+  const raw=(p.prompt.blocks||[]).map(b=>{
     const t=((L==='ko'?b.t:b.tEn)||'').trim();
     const head=((b.n?b.n+' ':'')+t).trim();
     if(b.cuts){
@@ -350,6 +372,7 @@ function assemble(p,L){
     const body=((L==='ko'?b.ko:b.en)||'').trim();
     return head? head+'\n'+body : body;
   }).join('\n\n');
+  return L==='en' ? seedanceSafe(raw) : raw;
 }
 function copyEn(){ cp(assembleEn(),'영문 프롬프트 복사됨 (씨댄스용)'); }
 function copyKoForClaude(){ cp('엑스콘다 '+SCENE.sceneId+' Part '+PART+' 한국어를 고쳤습니다. 영문 맞춰 새로 만들어주세요.\n\n'+assembleKo(),'한국어 복사됨 → 대화창에'); }

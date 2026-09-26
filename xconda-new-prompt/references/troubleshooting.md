@@ -11,6 +11,7 @@
 | **얼굴이 컷마다 바뀜(드리프트)** | @태그를 처음 컷에만 붙이고 이후 컷 생략 · 매번 다른 레퍼런스 사용 | 멀티컷은 **인물 나오는 매 컷 첫 프레임에 @ImageN 재호출** · 같은 인물=항상 같은 레퍼런스 1장 · 근본해법 i2v(키프레임) → §7 · `references/reference-image-prompts.md` |
 | **얼굴이 뭉개짐** | 한 인물에 얼굴 이미지 여러 장 업로드 | 얼굴 이미지는 인물당 1장 → `references/model-profile.md`(구 §4) |
 | **OTS 컷에서 얼굴이 구석·가림** | 화각만 주고 얼굴 위치 미지정 | 04·10번에 "얼굴 프레임 중앙" 한 줄씩 → `references/framing-and-scale.md`(구 §10-2) |
+| **패널 위치와 다르게, 씨댄스에서 옆·다른 가구로 감** | 영문이 패널과 다른 방향을 말함. `right behind`=화면 오른쪽, `is left standing`=화면 왼쪽, `reading … height`=책상에서 읽기, 근거 없는 `screen-left/right`, 첫 프레임 줄의 가구 이름 | 첫 프레임 줄은 인물·프레임 좌중우·전경중경후경만. 앞뒤는 `stacked in depth on the same center axis`. 생성은 `blocking_tools.frame_space_pair` 한 곳 → `references/output-and-schema.md`(구 §13-G) |
 | **화각이 검수 빨간불(예: 50°)** | 9단계 앵커 밖 값 사용 | 180/107/84/63/47/29/18/12/8°에서만(대화 기본 47°) → §10 · `references/creative-reference-tables.md` |
 | **대사 화자가 뒤바뀜 · "대사 없다"고 오인** | 대사를 컷 산문에 인라인으로 섞음 | 화자 라벨 별도 줄 + 대사 직후 0.5s beat → §4 · `references/model-profile.md` |
 | **레퍼런스가 무시됨** | 레퍼런스를 정의만 하고 타임라인에서 @태그 호출 안 함 | 첫 등장 컷에서 `@Image1` 인라인 호출(한·영 동일) → §7 |

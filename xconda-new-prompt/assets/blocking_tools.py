@@ -14,8 +14,9 @@ XCONDA 블로킹 도구 (v9.3)
   sync    좌표를 프롬프트 문장으로 옮긴다
           씨댄스는 JSON을 읽지 않는다. 좌표가 아무리 정확해도
           문장에 없으면 모델은 자기 마음대로 배치한다.
-          각 컷 첫머리에 "첫 프레임 공간 — 누가 / 프레임 어디에 /
-          렌즈에서 몇 미터 / 뒤에 무엇" 을 한 줄로 박는다.
+          각 컷 첫머리는 패널과 같은 말만 쓴다 — 누가 / 프레임 좌·중·우 /
+          전경·중경·후경. 가구 이름·샷 사이즈·"right behind"는 넣지 않는다.
+          씨댄스는 right/left 를 화면 방향으로 읽어, 패널의 앞뒤를 옆으로 옮긴다.
 
 사용법
     python3 blocking_tools.py check scene.json
@@ -39,6 +40,11 @@ STEP     = 0.12          # 경로 충돌 검사 간격
 
 NAME_KO = {"hyunwoo":"현우","daehan":"방대한","baksu":"박수","minhee":"민희",
            "kkangchul":"깡철이","chaokbun":"차옥분"}
+NAME_EN = {"hyunwoo":"Hyunwoo","daehan":"Daehan","baksu":"Baksu","minhee":"Minhee",
+           "kkangchul":"Kkangchul","chaokbun":"Cha Okbun"}
+# 깊이 구간은 문장에 미터를 쓰지 않기 위한 분류일 뿐, 프롬프트에 숫자가 나가지 않는다.
+DEPTH_NEAR = 2.5
+DEPTH_FAR = 4.5
 
 def name_map(S):
     """씬 refs.characters의 id→이름을 먼저 쓰고, 없는 인물만 내장 NAME_KO로 채운다.
@@ -203,41 +209,102 @@ def shot_size(d, hfov):
 
 CREATURES = {"kkangchul": "손바닥만 한 도마뱀"}
 INSERT_ONLY = {"chaokbun": "CUT8-9"}
+# 씨댄스 영문에 들어가면 패널 위치와 다른 곳으로 배치되는 말.
+# right behind → 화면 오른쪽, reading → 책상으로 가서 읽기, is left standing → 화면 왼쪽.
+SEEDANCE_POSITION_TRAPS = (
+    (re.compile(r"\bright behind\b", re.I), "directly behind"),
+    (re.compile(r"\bis left standing\b", re.I), "stays standing"),
+    (re.compile(r";\s*reading (about half|under a third of) the height", re.I), r"; at \1 the height"),
+)
 
-def spatial_line(S, part, cam, override):
-    R = rects(S); names = name_map(S)
+def seedance_position_safe(text):
+    """씨댄스에 붙이기 직전, 위치를 옆으로 옮기는 영어만 고친다. 의도된 frame-left/right 는 건드리지 않는다."""
+    out = text or ""
+    for pat, repl in SEEDANCE_POSITION_TRAPS:
+        out = pat.sub(repl, out)
+    return out
+
+def depth_words(d):
+    if d < DEPTH_NEAR:
+        return "전경", "in the foreground"
+    if d < DEPTH_FAR:
+        return "중경", "in the mid-ground"
+    return "후경", "in the background"
+
+def side_words(rel):
+    """rel>0 은 카메라 기준 화면 오른쪽(보는 사람 기준). 방의 좌우가 아니다."""
+    if abs(rel) < 7:
+        return "중앙", "frame-center"
+    if rel > 0:
+        return "오른쪽", "frame-right"
+    return "왼쪽", "frame-left"
+
+def _host(creature, t, bl):
+    """같은 좌표에 서 있는 사람 = 그 생물이 올라앉은 어깨. 이름을 하드코딩하지 않는다."""
+    best, bd = None, 0.4
+    for cid, p in bl.items():
+        if cid == creature or cid in CREATURES:
+            continue
+        d = math.hypot(p[0] - t[0], p[1] - t[1])
+        if d < bd:
+            best, bd = cid, d
+    return best
+
+def frame_space_pair(S, part, cam, override=None, names_en=None):
+    """패널 좌표 → 씨댄스가 그대로 두는 한 줄.
+
+    담는 것은 인물 / 프레임 좌·중·우 / 전경·중경·후경 뿐이다.
+    가구·샷 사이즈·크기 비교·미터는 넣지 않는다 — 넣으면 씨댄스가 그 가구 쪽으로 사람을 옮긴다.
+    """
+    override = override or {}
+    names = name_map(S)
+    en_names = dict(NAME_EN)
+    if names_en:
+        en_names.update(names_en)
     bl = {k: pts_of(v)[0] for k, v in part.get("blocking", {}).items()}
-    bl.update(override.get((part["partId"], cam["cutRef"]), {}))
-    c = (cam["x"]/40, cam["y"]/40); ang = cam.get("angle", 0); fov = cam.get("fov", 47)
+    bl.update(override.get((part.get("partId"), cam.get("cutRef")), {}))
+    c = (cam["x"] / 40.0, cam["y"] / 40.0)
+    ang = cam.get("angle", 0)
+    fov = cam.get("fov", 47)
+    # 인서트 전용 컷(굿당 환영 등)은 그 공간의 인물만. 사무실 좌표가 화각에 걸리면
+    # 씨댄스가 본편 인물을 다른 공간으로 데려간다.
+    insert_here = {cid for cid, ref in INSERT_ONLY.items() if ref == cam.get("cutRef")}
     vis = []
     for cid, t in bl.items():
-        if cid in INSERT_ONLY and cam["cutRef"] != INSERT_ONLY[cid]:
-            continue                            # 인서트 전용 인물은 본편 컷에 넣지 않는다
-        rel = ((math.degrees(math.atan2(t[1]-c[1], t[0]-c[0]))-ang+180) % 360)-180
-        if abs(rel) > fov/2+2:
+        if insert_here and cid not in insert_here:
             continue
-        seated = (part["blocking"].get(cid, {}).get("pose") in ("sit", "앉다"))
-        vis.append((math.hypot(t[0]-c[0], t[1]-c[1]), cid,
-                    "중앙" if abs(rel) < 7 else ("오른쪽" if rel > 0 else "왼쪽"),
-                    behind(R, c, t, own_chair=seated)))
+        if cid in INSERT_ONLY and cam.get("cutRef") != INSERT_ONLY[cid]:
+            continue
+        rel = ((math.degrees(math.atan2(t[1] - c[1], t[0] - c[0])) - ang + 180) % 360) - 180
+        if abs(rel) > fov / 2 + 2:
+            continue
+        vis.append((math.hypot(t[0] - c[0], t[1] - c[1]), cid, rel, t))
     vis.sort()
     if not vis:
-        return None
-    out = []
-    for i, (d, cid, side, (bg, bd)) in enumerate(vis):
+        return None, None
+    ko_bits, en_bits = [], []
+    for d, cid, rel, t in vis:
         if cid in CREATURES:
-            out.append("%s — %s, 프레임 %s에서 사람의 어깨 위에 올라앉은 채 함께 잡힌다"
-                       % (names.get(cid, cid), CREATURES[cid], side))
+            host = _host(cid, t, bl)
+            if host:
+                ko_bits.append("%s %s의 어깨 위에 있다" % (josa(names.get(cid, cid), "은", "는"), names.get(host, host)))
+                en_bits.append("%s is on %s's shoulder" % (en_names.get(cid, cid), en_names.get(host, host)))
+            else:
+                sk, se = side_words(rel)
+                dk, de = depth_words(d)
+                ko_bits.append("%s 프레임 %s %s" % (josa(names.get(cid, cid), "은", "는"), sk, dk))
+                en_bits.append("%s is at %s %s" % (en_names.get(cid, cid), se, de))
             continue
-        s = "%s — 프레임 %s, %s" % (names.get(cid, cid), side, shot_size(d, fov))
-        if bg:
-            s += ", %s %s 초점이 풀린 채 놓인다" % ("바로 뒤에" if bd < 1.2 else "그 너머 깊은 곳에", josa(bg))
-        if i > 0:
-            r = vis[0][0]/d
-            if r < 0.75:
-                s += "; 앞의 인물보다 키가 %s 작게 보이는 깊이" % ("절반쯤" if r > 0.45 else "3분의 1 이하로")
-        out.append(s)
-    return "첫 프레임 공간 — " + " / ".join(out) + "."
+        sk, se = side_words(rel)
+        dk, de = depth_words(d)
+        ko_bits.append("%s 프레임 %s %s" % (josa(names.get(cid, cid), "은", "는"), sk, dk))
+        en_bits.append("%s is at %s %s" % (en_names.get(cid, cid), se, de))
+    return ("첫 프레임 공간 — " + ", ".join(ko_bits) + ".",
+            "FIRST FRAME SPACE — " + "; ".join(en_bits) + ".")
+
+def spatial_line(S, part, cam, override):
+    ko, _en = frame_space_pair(S, part, cam, override)
+    return ko
 
 def sync(S, override=None):
     override = override or {}

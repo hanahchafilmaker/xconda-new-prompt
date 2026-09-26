@@ -351,6 +351,17 @@ Kkangchul is on Baksu's shoulder.
 담는 것은 **인물 / 프레임 좌·중·우 / 깊이(foreground · mid-ground · background)** 뿐이다.
 샷 사이즈·배경 가구·크기 비교·미터는 쓰지 않는다. 짧을수록 잘 먹힌다.
 
+**씨댄스에 붙이면 위치가 옆·다른 가구로 가는 말 — 쓰지 않는다.** 패널(좌표)과 영문이 다른 말로
+같은 자리를 가리키면, 씨댄스는 영문을 따르고 사람을 패널과 다른 곳에 둔다.
+
+| 쓰지 말 것 | 씨댄스가 하는 일 | 대신 |
+|---|---|---|
+| `right behind` (바로 뒤) | `right`를 화면 오른쪽으로 읽어 그쪽으로 옮긴다 | `directly behind` 또는 깊이만 (`in the foreground`) |
+| `reading … the height` (작게 보임) | `reading`을 서류 읽는 동작으로 실행해 책상으로 보낸다 | `at … the height` — 그런데 이 줄에는 크기 비교 자체를 넣지 않는다 |
+| `is left standing` (그 자리에 남음) | `left`를 화면 왼쪽으로 읽는다 | `stays where he is` / `stays out of this frame` |
+| `screen-left and screen-right` | 같은 축의 앞뒤인데도 양옆으로 벌린다 | 패널에서 실제로 좌우로 갈라진 컷에만. 앞뒤면 `stacked in depth on the same center axis` |
+| 첫 프레임 줄의 가구 이름 (`side desk`, `lockers`) | 그 가구를 그 인물의 자리로 읽는다 | 가구는 03번. 이 줄은 프레임 좌·중·우와 전경·중경·후경만 |
+
 연기·조명·카메라 무브는 여기 쓰지 않는다(각각 06·03·04번 소유).
 연기·조명·카메라 무브는 여기 쓰지 않는다(각각 06·03·04번 소유).
 

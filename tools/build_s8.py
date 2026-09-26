@@ -5,7 +5,7 @@ blocking_tools 로 검수한 뒤 편집기 .html 을 생성한다.
 
 실행: python3 tools/build_s8.py
 """
-import json, math, os, sys
+import json, os, sys
 
 ROOT = "/home/user/xconda-new-prompt"
 SKILL = os.path.join(ROOT, "xconda-new-prompt")
@@ -20,50 +20,10 @@ import s8_content as C
 OUT = os.path.join(ROOT, "output")
 os.makedirs(OUT, exist_ok=True)
 
-# ── 영문 "FIRST FRAME SPACE" 줄 — blocking_tools 의 실제 지오메트리 함수를 그대로 재사용 ──
-SHOT_EN = [(0.60, "a close-up filling frame with the face"), (1.00, "a bust framing, chest up"),
-           (1.50, "a medium, waist up"), (2.20, "a medium long, knees up"),
-           (3.20, "a full shot with the whole body in frame"),
-           (99.0, "a wide where the body reads at less than half the frame height")]
-BG_EN = {"사물함": "the steel lockers", "창고 사물함": "the storage lockers", "보조대": "the side desk",
-         "북측 책장": "the file shelves", "좌측 책장": "the file shelves", "공동 데스크": "the shared desks",
-         "의자": "an empty office chair", "복사기": "the copier", "정수기": "the water cooler",
-         "창고 문": "the storage door", "입구 나무문": "the wooden entrance door"}
-
+# ── 영문 "FIRST FRAME SPACE" — 패널과 같은 함수. 가구/"right behind" 를 넣지 않는다 ──
 def en_spatial(S, part, cam):
-    names = {c["id"]: C.NAME_EN.get(c["id"], c["id"]) for c in S["refs"]["characters"]}
-    R = blocking_tools.rects(S)
-    bl = {k: blocking_tools.pts_of(v)[0] for k, v in part.get("blocking", {}).items()}
-    c = (cam["x"] / 40, cam["y"] / 40); ang = cam.get("angle", 0); fov = cam.get("fov", 47)
-    vis = []
-    for cid, t in bl.items():
-        if cid in blocking_tools.INSERT_ONLY and cam["cutRef"] != blocking_tools.INSERT_ONLY[cid]:
-            continue
-        rel = ((math.degrees(math.atan2(t[1] - c[1], t[0] - c[0])) - ang + 180) % 360) - 180
-        if abs(rel) > fov / 2 + 2:
-            continue
-        seated = part["blocking"].get(cid, {}).get("pose") in ("sit", "앉다")
-        vis.append((math.hypot(t[0] - c[0], t[1] - c[1]), cid,
-                    "center" if abs(rel) < 7 else ("right" if rel > 0 else "left"),
-                    blocking_tools.behind(R, c, t, own_chair=seated)))
-    vis.sort()
-    if not vis:
-        return None
-    out = []
-    for i, (d, cid, side, (bg, bd)) in enumerate(vis):
-        if cid in blocking_tools.CREATURES:
-            out.append("%s — a %s, framed %s of frame perched on Baksu's shoulder"
-                       % (names.get(cid, cid), blocking_tools.CREATURES[cid], side))
-            continue
-        H = 2 * d * math.tan(math.atan(math.tan(math.radians(fov) / 2) * 9 / 16))   # 프레임이 담는 실제 높이(m)
-        size = next(t for lim, t in SHOT_EN if H < lim)
-        s = "%s — %s of frame, %s" % (names.get(cid, cid), side, size)
-        if bg:
-            s += ", with %s sitting out of focus %s" % (BG_EN.get(bg, bg), "right behind" if bd < 1.2 else "far behind")
-        if i > 0 and vis[0][0] / d < 0.75:
-            s += "; reading %s the height of the nearer figure" % ("about half" if vis[0][0] / d > 0.45 else "under a third of")
-        out.append(s)
-    return "FIRST FRAME SPACE — " + " / ".join(out) + "."
+    _ko, en = blocking_tools.frame_space_pair(S, part, cam, names_en=C.NAME_EN)
+    return en
 
 # ── 블록 조립 ──────────────────────────────────────────────────────────
 def refs_block(pid):
@@ -143,10 +103,10 @@ def b10(pid):
                "· The two light sources — blue fluorescents and yellow desk lamps — hold the same position and intensity from first frame to last.",
                "· Room tone (fluorescent hum, wall clock ticking) continues unbroken across every cut."]
     extra = {
-     "A": ("· 방대한은 안쪽 가장 높은 책상 뒤, 현우는 출입문 쪽 통로에 머물며 두 사람의 좌우 위치가 파트 내내 유지된다.",
-           "· Daehan stays behind the tallest desk at the far end and Hyunwoo in the aisle by the entrance; their screen-left and screen-right positions hold throughout the part."),
-     "B": ("· 방대한은 책상 뒤, 현우는 통로에 머물며 두 사람의 좌우 위치가 파트 내내 유지된다.",
-           "· Daehan stays behind the desk and Hyunwoo in the aisle; their screen-left and screen-right positions hold throughout the part."),
+     "A": ("· 방대한은 안쪽 가장 높은 책상 뒤에 머물고, 현우는 출입문 쪽 통로에 머문다. 두 사람은 같은 중심축에서 앞뒤로 겹친다.",
+           "· Daehan stays behind the tallest desk at the far end, and Hyunwoo stays in the aisle by the entrance. The two stay stacked in depth on the same center axis."),
+     "B": ("· 방대한은 책상 뒤에, 현우는 통로에, 같은 중심축의 앞뒤로 머문다.",
+           "· Daehan stays behind the desk, and Hyunwoo stays in the aisle. The two stay stacked in depth on the same center axis."),
      "C": ("· 박수는 사물함 쪽에서, 현우는 통로 중앙에서 자리하며 깡철이는 박수의 어깨 위에 머문다.",
            "· Baksu holds his ground by the lockers, Hyunwoo in the middle of the aisle, and Kkangchul stays on Baksu's shoulder."),
      "D": ("· 깡철이는 현우의 몸 위를 벗어날 때에도 손바닥만 한 크기를 유지한다.",
@@ -252,7 +212,13 @@ def main():
                 continue
             body = [l for l in cut["en"].split("\n") if not l.startswith("FIRST FRAME SPACE —")]
             body.insert(1, ln)
-            cut["en"] = "\n".join(body)
+            cut["en"] = blocking_tools.seedance_position_safe("\n".join(body))
+    for p in S["parts"]:
+        for b in p["prompt"]["blocks"]:
+            if b.get("en"):
+                b["en"] = blocking_tools.seedance_position_safe(b["en"])
+            if b.get("headEn"):
+                b["headEn"] = blocking_tools.seedance_position_safe(b["headEn"])
     scene_path = os.path.join(OUT, "S8_scene.json")
     json.dump(S, open(scene_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     n = blocking_tools.sync(S)                     # 한국어 공간 문장(좌표에서 계산)
