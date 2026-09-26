@@ -81,6 +81,9 @@ font-family:var(--mono);font-size:12px;line-height:1.8;padding:8px 14px;resize:v
     <span class="brand">XCONDA ENGINE · SCENE-V1 · KO</span>
     <span class="slug" id="hSlug">XCONDA ENGINE</span>
     <span class="meta" id="hMeta">씬 JSON을 드롭하세요</span>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <a href="/storyboard" class="btn sm pri" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px">📝 글콘티 작업실 (스토리보드)</a>
+    </div>
   </div>
 
   <div id="drop">
@@ -2371,5 +2374,24 @@ const EMBEDDED_SCENE = {
   }
  ]
 };
-(function autoload(){ if(EMBEDDED_SCENE && EMBEDDED_SCENE.schema){ loadScene(EMBEDDED_SCENE); } })();
+(function autoload(){
+  try {
+    if(typeof window !== 'undefined' && window.location && window.location.search){
+      const params = new URLSearchParams(window.location.search);
+      if(params.has('import') && typeof sessionStorage !== 'undefined'){
+        const imported = sessionStorage.getItem('XCONDA_IMPORT_SCENE');
+        if(imported){
+          sessionStorage.removeItem('XCONDA_IMPORT_SCENE');
+          const data = JSON.parse(imported);
+          if(data && data.schema === 'xconda-scene-v1'){
+            loadScene(data);
+            toast('글콘티에서 변환된 씬을 불러왔습니다');
+            return;
+          }
+        }
+      }
+    }
+  } catch(e){}
+  if(EMBEDDED_SCENE && EMBEDDED_SCENE.schema){ loadScene(EMBEDDED_SCENE); }
+})();
 </script>

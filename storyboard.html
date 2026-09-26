@@ -1,0 +1,1929 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XCONDA 글콘티 스튜디오 · Storyboard Workspace</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0A;--panel:#121212;--panel2:#181818;--panel3:#202020;
+  --rule:#262626;--rule2:#383838;--rule-focus:#FFC800;
+  --ink:#F2F2F0;--dim:#9A9A95;--dim2:#636360;--dim3:#40403E;
+  --y:#FFC800;--y-dim:#8A6E00;--y-bg:rgba(255,200,0,0.08);
+  --warn:#FF5C3D;--ok:#8FAE6B;--blue:#4DA6FF;--purple:#B388FF;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --kr:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--kr);
+  font-size:13px;line-height:1.55;min-height:100vh;
+  display:flex;flex-direction:column;overflow-x:hidden;
+}
+
+/* ── 헤더 네비게이션 ── */
+.g-nav{
+  background:rgba(14,14,14,0.96);border-bottom:1px solid var(--rule);
+  position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+}
+.g-nav-in{
+  max-width:1600px;margin:0 auto;padding:10px 18px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.g-brand{
+  display:flex;align-items:center;gap:8px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.08em;color:var(--dim);
+}
+.g-brand b{color:var(--y);font-size:14px;letter-spacing:0}
+.g-brand .badge{
+  background:var(--panel2);border:1px solid var(--rule2);
+  color:var(--y);padding:2px 6px;border-radius:3px;font-size:10px;
+}
+.g-tabs{display:flex;gap:4px;margin-left:auto;align-items:center}
+.g-tab{
+  padding:6px 13px;border-radius:4px;border:1px solid transparent;
+  color:var(--dim);font-size:12px;cursor:pointer;display:inline-flex;
+  align-items:center;gap:6px;text-decoration:none;transition:.15s;
+}
+.g-tab:hover{color:var(--ink);border-color:var(--rule)}
+.g-tab.on{
+  background:var(--panel2);border-color:var(--y);color:var(--y);font-weight:700;
+}
+.g-status{
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);
+  font-size:11px;color:var(--dim);padding:3px 8px;border-radius:3px;
+  background:var(--panel);border:1px solid var(--rule);
+}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--ok)}
+.dot.saving{background:var(--y);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── 메인 레이아웃: 사이드바 + 에디터 ── */
+.app-body{
+  flex:1;display:flex;max-width:1600px;width:100%;margin:0 auto;
+}
+/* 사이드바 */
+.sidebar{
+  width:320px;border-right:1px solid var(--rule);background:var(--panel);
+  display:flex;flex-direction:column;flex-shrink:0;min-height:calc(100vh - 54px);
+}
+.sb-header{
+  padding:14px;border-bottom:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:10px;
+}
+.sb-title-row{display:flex;align-items:center;justify-content:space-between}
+.sb-title{font-size:12px;font-weight:700;color:var(--dim);font-family:var(--mono)}
+.sb-actions{display:flex;gap:6px}
+.btn{
+  background:var(--panel2);border:1px solid var(--rule2);color:var(--ink);
+  padding:6px 12px;font-size:12px;border-radius:4px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--kr);
+  transition:.15s;line-height:1.2;
+}
+.btn:hover{border-color:var(--y);color:var(--y)}
+.btn.pri{background:var(--y);color:#0A0A0A;border-color:var(--y);font-weight:700}
+.btn.pri:hover{background:#e6b400;color:#0A0A0A}
+.btn.sm{padding:4px 8px;font-size:11px}
+.btn.danger:hover{border-color:var(--warn);color:var(--warn)}
+.btn-icon{padding:4px 7px;font-size:12px;color:var(--dim)}
+.btn-icon:hover{color:var(--y)}
+.search-box{position:relative}
+.search-box input{
+  width:100%;background:var(--bg);border:1px solid var(--rule);
+  border-radius:4px;color:var(--ink);padding:6px 9px 6px 28px;
+  font-size:12px;outline:none;
+}
+.search-box input:focus{border-color:var(--y)}
+.search-box .si{
+  position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  color:var(--dim2);font-size:12px;pointer-events:none;
+}
+/* 리스트 */
+.story-list{
+  flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;
+}
+.story-item{
+  padding:10px 12px;background:var(--panel2);border:1px solid var(--rule);
+  border-radius:5px;cursor:pointer;display:flex;flex-direction:column;gap:4px;
+  position:relative;transition:.15s;
+}
+.story-item:hover{border-color:var(--rule2);background:#1d1d1d}
+.story-item.active{
+  border-color:var(--y);background:#221e14;box-shadow:inset 3px 0 0 var(--y);
+}
+.si-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.si-id{font-family:var(--mono);font-size:11px;color:var(--y);font-weight:700}
+.si-date{font-size:10px;color:var(--dim2);font-family:var(--mono)}
+.si-title{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-meta{
+  display:flex;align-items:center;gap:8px;font-size:11px;color:var(--dim);
+  font-family:var(--mono);
+}
+.si-actions{
+  position:absolute;right:8px;bottom:8px;display:none;gap:4px;
+}
+.story-item:hover .si-actions{display:flex}
+
+.sb-footer{
+  padding:10px 14px;border-top:1px solid var(--rule);background:var(--bg);
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+/* ── 메인 에디터 영역 ── */
+.main-stage{
+  flex:1;display:flex;flex-direction:column;min-width:0;
+  background:var(--bg);
+}
+/* 툴바 */
+.editor-toolbar{
+  padding:12px 22px;border-bottom:1px solid var(--rule);
+  background:var(--panel);display:flex;align-items:center;gap:12px;
+  flex-wrap:wrap;justify-content:space-between;
+}
+.et-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.et-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mode-switch{
+  display:inline-flex;background:var(--bg);border:1px solid var(--rule);
+  border-radius:4px;padding:2px;
+}
+.mode-btn{
+  background:none;border:none;color:var(--dim);padding:5px 12px;
+  font-size:12px;border-radius:3px;cursor:pointer;font-family:var(--kr);
+  transition:.15s;
+}
+.mode-btn.on{background:var(--panel2);color:var(--y);font-weight:700}
+
+/* 스크롤 가능한 본문 */
+.editor-content{
+  flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:18px;
+}
+
+/* 씬 헤더 메타데이터 박스 */
+.scene-meta-card{
+  background:var(--panel);border:1px solid var(--rule);border-radius:6px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:14px;
+}
+.meta-row{display:grid;grid-template-columns:120px 1fr 1fr;gap:12px}
+@media(max-width:960px){.meta-row{grid-template-columns:1fr}}
+.meta-field{display:flex;flex-direction:column;gap:5px}
+.meta-field label{
+  font-family:var(--mono);font-size:10.5px;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.06em;
+}
+.meta-input{
+  background:var(--bg);border:1px solid var(--rule);border-radius:4px;
+  color:var(--ink);padding:7px 10px;font-size:13px;font-family:inherit;
+  outline:none;transition:.15s;
+}
+.meta-input:focus{border-color:var(--y);background:#0f0f0f}
+.tag-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.tag-chip{
+  background:var(--panel2);border:1px solid var(--rule2);
+  color:var(--y);font-size:11px;padding:2px 7px;border-radius:3px;
+  font-family:var(--mono);display:inline-flex;align-items:center;gap:4px;
+}
+
+/* ── 모드 1: 자유 텍스트 대본 모드 ── */
+.raw-mode{display:none;flex-direction:column;gap:12px}
+.raw-mode.on{display:flex}
+.raw-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;background:var(--panel2);border:1px solid var(--rule);
+  border-radius:5px 5px 0 0;font-size:12px;color:var(--dim);
+}
+.raw-editor-wrap{
+  border:1px solid var(--rule);border-top:none;border-radius:0 0 5px 5px;
+  background:#0D0D0D;position:relative;
+}
+.raw-textarea{
+  width:100%;height:460px;background:transparent;border:none;
+  color:var(--ink);font-family:var(--mono);font-size:12.5px;
+  line-height:1.75;padding:16px;resize:vertical;outline:none;
+}
+.raw-textarea:focus{background:#111}
+.format-guide{
+  background:var(--panel2);border:1px solid var(--rule);border-radius:6px;
+  padding:14px;font-size:12px;color:var(--dim);line-height:1.7;
+}
+.format-guide code{
+  background:var(--bg);color:var(--y);padding:2px 5px;border-radius:3px;
+  font-family:var(--mono);font-size:11px;
+}
+
+/* ── 모드 2: 컷 카드 에디터 모드 ── */
+.cards-mode{display:none;flex-direction:column;gap:14px}
+.cards-mode.on{display:flex}
+.cuts-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2px;
+}
+.cuts-count{
+  font-size:12px;font-family:var(--mono);color:var(--dim);
+}
+.cuts-count b{color:var(--y)}
+.cuts-list{display:flex;flex-direction:column;gap:14px}
+
+.cut-card{
+  background:var(--panel);border:1px solid var(--rule);border-radius:6px;
+  overflow:hidden;transition:.15s;
+}
+.cut-card:hover{border-color:var(--rule2)}
+.cut-card-head{
+  background:var(--panel2);padding:10px 14px;border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;gap:10px;border-left:3px solid var(--y);
+}
+.cut-num{
+  font-family:var(--mono);font-size:12px;font-weight:700;color:var(--y);
+  min-width:65px;
+}
+.cut-tc-group{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px}
+.cut-tc-group input{
+  width:50px;background:var(--bg);border:1px solid var(--rule);
+  color:var(--ink);border-radius:3px;padding:3px 6px;text-align:center;
+  font-family:var(--mono);font-size:11px;outline:none;
+}
+.cut-dur-badge{
+  font-size:10.5px;color:var(--dim);padding:2px 6px;
+  background:var(--bg);border-radius:3px;border:1px solid var(--rule);
+}
+.cut-card-tools{margin-left:auto;display:flex;gap:4px}
+
+.cut-card-body{padding:14px;display:flex;flex-direction:column;gap:12px}
+.cut-specs{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;
+}
+.spec-box{display:flex;flex-direction:column;gap:4px}
+.spec-box label{font-size:10.5px;color:var(--dim);font-family:var(--mono)}
+.spec-box select, .spec-box input{
+  background:var(--bg);border:1px solid var(--rule);border-radius:3px;
+  color:var(--ink);padding:5px 8px;font-size:12px;outline:none;
+}
+.spec-box select:focus, .spec-box input:focus{border-color:var(--y)}
+
+.cut-desc-box{display:flex;flex-direction:column;gap:4px}
+.cut-desc-box label{font-size:11px;color:var(--dim);font-weight:700}
+.cut-desc-box textarea{
+  width:100%;min-height:64px;background:var(--bg);border:1px solid var(--rule);
+  border-radius:4px;color:var(--ink);padding:8px 10px;font-size:12.5px;
+  line-height:1.6;font-family:inherit;resize:vertical;outline:none;
+}
+.cut-desc-box textarea:focus{border-color:var(--y)}
+
+.cut-dlg-box{
+  background:var(--panel2);border:1px solid var(--rule);border-radius:4px;
+  padding:10px 12px;display:flex;flex-direction:column;gap:6px;
+}
+.cut-dlg-head{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:var(--dim);font-family:var(--mono);
+}
+.cut-dlg-inputs{display:grid;grid-template-columns:120px 1fr;gap:8px}
+.cut-dlg-speaker{
+  background:var(--bg);border:1px solid var(--rule);border-radius:3px;
+  color:var(--y);font-weight:700;padding:5px 8px;font-size:12px;outline:none;
+}
+.cut-dlg-text{
+  background:var(--bg);border:1px solid var(--rule);border-radius:3px;
+  color:var(--ink);padding:5px 10px;font-size:12px;outline:none;
+}
+
+.add-cut-btn{
+  border:2px dashed var(--rule2);background:transparent;color:var(--dim);
+  padding:16px;border-radius:6px;cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:.15s;font-weight:600;
+}
+.add-cut-btn:hover{border-color:var(--y);color:var(--y);background:var(--y-bg)}
+
+/* ── 플로팅 액션 바 ── */
+.floating-bar{
+  position:sticky;bottom:0;background:rgba(12,12,12,0.95);
+  border-top:1px solid var(--rule);padding:10px 22px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;z-index:40;backdrop-filter:blur(8px);
+}
+.fb-left{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim)}
+.fb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ── 모달 팝업 ── */
+.modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);
+  display:none;align-items:center;justify-content:center;z-index:100;
+  backdrop-filter:blur(4px);padding:20px;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--panel);border:1px solid var(--rule2);border-radius:8px;
+  max-width:850px;width:100%;max-height:85vh;display:flex;flex-direction:column;
+  box-shadow:0 12px 40px rgba(0,0,0,0.8);
+}
+.modal-head{
+  padding:14px 18px;border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-head h3{font-size:14px;color:var(--y)}
+.modal-body{
+  padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;
+}
+.modal-code{
+  background:#090909;border:1px solid var(--rule);border-radius:4px;
+  color:#9CDCFE;font-family:var(--mono);font-size:11.5px;line-height:1.6;
+  padding:12px;white-space:pre;overflow-x:auto;max-height:450px;
+}
+.modal-foot{
+  padding:12px 18px;border-top:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;
+}
+
+/* 토스트 */
+.toast{
+  position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--y);color:#0A0A0A;padding:9px 22px;border-radius:4px;
+  font-size:12.5px;font-weight:700;opacity:0;transition:.25s;
+  pointer-events:none;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.4);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:820px){
+  .app-body{flex-direction:column}
+  .sidebar{width:100%;min-height:auto;max-height:280px;border-right:none;border-bottom:1px solid var(--rule)}
+}
+</style>
+</head>
+<body>
+
+<!-- 글로벌 내비게이션 -->
+<nav class="g-nav">
+  <div class="g-nav-in">
+    <div class="g-brand">
+      <b>XCONDA</b>
+      <span>글콘티 작업실 &amp; 저장소</span>
+      <span class="badge">STORYBOARD STUDIO</span>
+    </div>
+
+    <div class="g-status" id="saveStatus">
+      <span class="dot" id="saveDot"></span>
+      <span id="saveText">자동 저장 활성</span>
+    </div>
+
+    <div class="g-tabs">
+      <a href="/storyboard" class="g-tab on" id="tabConti">📝 글콘티 작업실</a>
+      <a href="/" class="g-tab" id="tabEngine">🎬 XCONDA 씬 에디터</a>
+    </div>
+  </div>
+</nav>
+
+<div class="app-body">
+  <!-- 좌측 사이드바: 글콘티 저장소 & 라이브러리 -->
+  <aside class="sidebar">
+    <div class="sb-header">
+      <div class="sb-title-row">
+        <span class="sb-title">내 글콘티 저장소 (<span id="storyCount">0</span>)</span>
+        <div class="sb-actions">
+          <button class="btn pri sm" onclick="createNewStoryboard()" title="새 글콘티 작성">+ 새 글콘티</button>
+        </div>
+      </div>
+      <div class="search-box">
+        <span class="si">🔍</span>
+        <input type="text" id="searchInput" placeholder="씬 번호, 제목, 인물 검색..." oninput="filterStoryboards()">
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn sm" style="flex:1" onclick="openSampleSelector()">📚 예제 불러오기</button>
+        <button class="btn sm" onclick="triggerFileInput()" title="파일 불러오기 (JSON/TXT)">📂 파일 열기</button>
+        <input type="file" id="fileUploadInput" accept=".json,.txt,.md" style="display:none" onchange="handleFileUpload(event)">
+      </div>
+    </div>
+
+    <!-- 저장된 글콘티 목록 -->
+    <div class="story-list" id="storyList">
+      <!-- 자바스크립트로 렌더링 -->
+    </div>
+
+    <div class="sb-footer">
+      <button class="btn sm" onclick="exportAllBackup()" title="모든 글콘티를 JSON 백업 파일로 저장">💾 전체 백업</button>
+      <button class="btn sm danger" onclick="confirmResetAll()" title="기본 예제로 초기화">초기화</button>
+    </div>
+  </aside>
+
+  <!-- 메인 작업실 -->
+  <main class="main-stage">
+    <!-- 상단 툴바 -->
+    <div class="editor-toolbar">
+      <div class="et-left">
+        <div class="mode-switch">
+          <button class="mode-btn on" id="btnModeCards" onclick="setMode('cards')">🎬 컷별 카드 에디터</button>
+          <button class="mode-btn" id="btnModeRaw" onclick="setMode('raw')">📋 자유 대본 / 붙여넣기</button>
+        </div>
+        <span id="runtimeSummary" style="font-family:var(--mono);font-size:11.5px;color:var(--dim)">
+          총 0 CUTS · 0.0s
+        </span>
+      </div>
+
+      <div class="et-right">
+        <button class="btn" onclick="saveCurrentStoryboard(true)">💾 저장 (Ctrl+S)</button>
+        <button class="btn" onclick="openJsonModal()">⚙️ 씬 JSON 변환</button>
+        <button class="btn pri" onclick="launchInEngine()">🚀 XCONDA 에디터로 열기</button>
+      </div>
+    </div>
+
+    <div class="editor-content">
+      <!-- 씬 기본 메타데이터 -->
+      <section class="scene-meta-card">
+        <div class="meta-row">
+          <div class="meta-field">
+            <label>씬 번호 (ID)</label>
+            <input type="text" class="meta-input" id="metaSceneId" placeholder="예: S#8" oninput="markChanged()">
+          </div>
+          <div class="meta-field">
+            <label>씬 제목</label>
+            <input type="text" class="meta-input" id="metaTitle" placeholder="예: 0과 위장사무실 첫 대면" oninput="markChanged()">
+          </div>
+          <div class="meta-field">
+            <label>공간 / 장소</label>
+            <input type="text" class="meta-input" id="metaLocation" placeholder="예: 창문 없는 낡은 사무실 (9m x 7m)" oninput="markChanged()">
+          </div>
+        </div>
+
+        <div class="meta-row" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="meta-field">
+            <label>시간대 / 환경 / 무드</label>
+            <input type="text" class="meta-input" id="metaAtmosphere" placeholder="예: 실내 · 형광등 4300K · 긴장감" oninput="markChanged()">
+          </div>
+          <div class="meta-field">
+            <label>등장인물 (쉼표로 구분)</label>
+            <input type="text" class="meta-input" id="metaCast" placeholder="예: 현우, 방대한, 박수" oninput="onCastChange()">
+            <div class="tag-chips" id="castChips"></div>
+          </div>
+          <div class="meta-field">
+            <label>주요 소품 / 세트 오브젝트</label>
+            <input type="text" class="meta-input" id="metaProps" placeholder="예: 서류더미, 철제캐비넷, 낡은 시계" oninput="markChanged()">
+          </div>
+        </div>
+
+        <div class="meta-field">
+          <label>시놉시스 / 씬 요약 지문 (로그라인)</label>
+          <input type="text" class="meta-input" id="metaSynopsis" placeholder="씬의 핵심 사건과 인물 동선 요약..." oninput="markChanged()">
+        </div>
+      </section>
+
+      <!-- 모드 1: 자유 대본 / 붙여넣기 모드 -->
+      <section class="raw-mode" id="secRawMode">
+        <div class="raw-toolbar">
+          <span>대본 형식의 글콘티를 붙여넣거나 직접 작성하세요. 스마트 분석을 누르면 컷별 카드로 자동 정리됩니다.</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn sm" onclick="syncCardsToRaw()">🔄 컷 카드 내용 가져오기</button>
+            <button class="btn pri sm" onclick="parseRawScriptToCards()">⚡ 스마트 컷 분석 (Parse)</button>
+          </div>
+        </div>
+
+        <div class="raw-editor-wrap">
+          <textarea class="raw-textarea" id="rawScriptText" placeholder="[대본/글콘티 원문 예시]
+
+S#8 0과 위장사무실 (실내, 낮)
+등장인물: 현우, 방대한, 박수
+
+CUT 8-1 [0.0-3.5초] 풀 샷 84° 돌리 인
+철문이 천천히 열리고 현우가 어두운 통로에서 조심스럽게 걸어 들어온다.
+대사 — 방대한: {문 닫고 들어와. 찬바람 들어온다.}
+
+CUT 8-2 [3.5-7.0초] 미디엄 샷 47° 고정
+현우가 문을 닫고 책장 앞에 멈춰 서서 헛기침을 한다.
+대사 — 현우: {신입 이현우입니다. 오늘 자로 발령받았습니다.}
+
+CUT 8-3 [7.0-11.0초] 클로즈업 34° 고정
+방대한이 서류를 멈추고 날카로운 눈으로 현우를 올려다본다.
+대사 — 방대한: {자네 어머니... 차옥분 씨 소식은 들었나?}" oninput="markChanged()"></textarea>
+        </div>
+
+        <div class="format-guide">
+          <b>💡 스마트 분석 추천 표기법:</b><br>
+          • 컷 헤더: <code>CUT 1</code> 또는 <code>CUT 8-1 [0-3.5초] 풀 샷 84°</code><br>
+          • 대사 라벨: <code>대사 — 화자: {대사 내용}</code> 또는 <code>화자: "대사 내용"</code><br>
+          • 지문/액션: 컷 헤더 바로 아래 자유롭게 서술 (첫 프레임 공간, 인물 동작, 카메라 시선)
+        </div>
+      </section>
+
+      <!-- 모드 2: 구조화된 컷별 카드 에디터 -->
+      <section class="cards-mode on" id="secCardsMode">
+        <div class="cuts-header">
+          <span class="cuts-count">컷 목록 (<b id="cutCardsCount">0</b>컷)</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn sm" onclick="syncRawToCards()">📋 텍스트 대본에서 동기화</button>
+            <button class="btn pri sm" onclick="addCutCard()">+ 새 컷 추가</button>
+          </div>
+        </div>
+
+        <div class="cuts-list" id="cutsList">
+          <!-- 컷 카드들이 자바스크립트로 렌더링됨 -->
+        </div>
+
+        <button class="add-cut-btn" onclick="addCutCard()">
+          <span>+ 컷 추가하기 (Add Cut)</span>
+        </button>
+      </section>
+    </div>
+
+    <!-- 하단 플로팅 바 -->
+    <div class="floating-bar">
+      <div class="fb-left">
+        <span id="saveSummaryInfo">마지막 저장: 방금 전</span>
+      </div>
+      <div class="fb-right">
+        <button class="btn sm" onclick="copyCleanScript()">📋 대본 복사</button>
+        <button class="btn sm" onclick="copyClaudePromptRequest()">🤖 Claude 요청문 복사</button>
+        <button class="btn sm" onclick="downloadTxtFile()">📄 TXT 다운로드</button>
+        <button class="btn sm" onclick="downloadJsonFile()">📦 JSON 다운로드</button>
+        <button class="btn pri sm" onclick="saveCurrentStoryboard(true)">💾 저장</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- 씬 JSON 변환 미리보기 모달 -->
+<div class="modal-overlay" id="jsonModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>XCONDA scene-v1 규격 JSON 변환 결과</h3>
+      <button class="btn-icon" onclick="closeJsonModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--dim)">
+        현재 글콘티를 바탕으로 자동 생성된 <code>xconda-scene-v1</code> 스키마 JSON입니다.
+        카메라 좌표, 룸 셋업, 10블록 프롬프트 구조가 포함되어 있습니다.
+      </p>
+      <div class="modal-code" id="jsonModalCode"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn sm" onclick="copyGeneratedJson()">📋 JSON 복사</button>
+      <button class="btn sm" onclick="downloadGeneratedJson()">📥 .json 다운로드</button>
+      <button class="btn pri sm" onclick="launchInEngine()">🚀 이 데이터로 에디터 열기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 예제 선택 모달 -->
+<div class="modal-overlay" id="sampleModal">
+  <div class="modal" style="max-width:550px">
+    <div class="modal-head">
+      <h3>표준 글콘티 예제 선택</h3>
+      <button class="btn-icon" onclick="closeSampleModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn" style="text-align:left;padding:12px;justify-content:flex-start" onclick="loadSamplePreset('s8')">
+          <div>
+            <div style="font-weight:700;color:var(--y)">S#8 0과 위장사무실 (표준 5컷 — 서스펜스)</div>
+            <div style="font-size:11px;color:var(--dim);margin-top:3px">XCONDA 대표 씬. 신입 현우와 과장 방대한의 대면 및 캐비넷 소음.</div>
+          </div>
+        </button>
+        <button class="btn" style="text-align:left;padding:12px;justify-content:flex-start" onclick="loadSamplePreset('action')">
+          <div>
+            <div style="font-weight:700;color:var(--y)">S#1 빗속 골목길 추격전 (박진감 액션 4컷)</div>
+            <div style="font-size:11px;color:var(--dim);margin-top:3px">폭우 속 질주와 코너링, 핸드헬드와 트래킹 샷 중심의 컷 구성.</div>
+          </div>
+        </button>
+        <button class="btn" style="text-align:left;padding:12px;justify-content:flex-start" onclick="loadSamplePreset('cafe')">
+          <div>
+            <div style="font-weight:700;color:var(--y)">S#3 카페 창가 대화 (감성/인서트 3컷)</div>
+            <div style="font-size:11px;color:var(--dim);margin-top:3px">비 내리는 창가, 커피잔과 다이어리 인서트 및 잔잔한 감정 대화.</div>
+          </div>
+        </button>
+        <button class="btn" style="text-align:left;padding:12px;justify-content:flex-start" onclick="loadSamplePreset('blank')">
+          <div>
+            <div style="font-weight:700;color:var(--ink)">새 빈 글콘티 템플릿</div>
+            <div style="font-size:11px;color:var(--dim);margin-top:3px">처음부터 자유롭게 작성할 수 있는 기본 구조.</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   XCONDA 글콘티 스튜디오 (Storyboard Workspace) 로직
+   ───────────────────────────────────────────────────────────── */
+
+const STORAGE_KEY = 'xconda_storyboards_v2';
+let storyboards = [];
+let currentId = null;
+let saveTimer = null;
+let isDirty = false;
+
+/* 표준 샘플 데이터 세트 */
+const DEFAULT_SAMPLES = [
+  {
+    id: "story_s8",
+    sceneId: "S#8",
+    title: "0과 위장사무실 — 첫 대면",
+    location: "0과 위장사무실 (창문 없는 낡은 사무실, 9m x 7m)",
+    atmosphere: "실내 · 4300K 형광등 + 2700K 데스크 램프 · 서스펜스",
+    cast: "현우, 방대한, 박수",
+    props: "서류더미, 철제캐비넷, 낡은 벽시계, 노란 백열 스탠드",
+    synopsis: "디비전 제로 신입 현우가 어둠 속 철문을 열고 들어와 과장 방대한과 마주한다. 굳어 있는 공기 속에서 캐비넷 뒤의 소음이 들려온다.",
+    updatedAt: new Date().toISOString(),
+    cuts: [
+      {
+        id: "c1",
+        num: "CUT 8-1",
+        start: 0.0,
+        end: 3.5,
+        shotSize: "풀 샷",
+        fov: 84,
+        cameraMove: "돌리 인",
+        subject: "현우",
+        action: "철문이 천천히 열리고 현우가 어두운 통로에서 사무실 안으로 조심스럽게 걸어 들어온다. 서류더미 너머로 방대한의 실루엣이 보인다.",
+        speaker: "방대한",
+        dialogue: "문 닫고 들어와. 찬바람 들어온다."
+      },
+      {
+        id: "c2",
+        num: "CUT 8-2",
+        start: 3.5,
+        end: 7.0,
+        shotSize: "미디엄 샷",
+        fov: 47,
+        cameraMove: "픽스 (고정)",
+        subject: "현우",
+        action: "현우가 문을 닫고 서류 책장 앞에 멈춰 선다. 헛기침을 한 번 하고 어깨를 펴며 인사를 건넨다.",
+        speaker: "현우",
+        dialogue: "신입 이현우입니다. 오늘 자로 발령받았습니다."
+      },
+      {
+        id: "c3",
+        num: "CUT 8-3",
+        start: 7.0,
+        end: 11.0,
+        shotSize: "클로즈업",
+        fov: 34,
+        cameraMove: "픽스 (고정)",
+        subject: "방대한",
+        action: "방대한이 넘기던 서류를 멈추고 천천히 고개를 들어 현우를 쳐다본다. 뿔테 안경 너머로 날카로운 시선이 꽂힌다.",
+        speaker: "방대한",
+        dialogue: "자네 어머니... 차옥분 씨 소식은 들었나?"
+      },
+      {
+        id: "c4",
+        num: "CUT 8-4",
+        start: 11.0,
+        end: 14.5,
+        shotSize: "익스트림 클로즈업",
+        fov: 18,
+        cameraMove: "틸트 업",
+        subject: "현우",
+        action: "현우의 턱에 힘이 들어가며 눈동자가 흔들린다. 긴장으로 굳은 손가락이 주먹을 쥐었다 펴진다.",
+        speaker: "현우",
+        dialogue: "어머니 이야기는... 여기서 왜 나옵니까."
+      },
+      {
+        id: "c5",
+        num: "CUT 8-5",
+        start: 14.5,
+        end: 18.0,
+        shotSize: "미디엄 샷",
+        fov: 63,
+        cameraMove: "팬 우측",
+        subject: "박수",
+        action: "두 사람 사이의 무거운 침묵 속에서, 저 뒤쪽 철제 캐비넷 문이 끼익 소리를 내며 불쑥 열린다.",
+        speaker: "박수",
+        dialogue: "어이쿠, 손님이 벌써 오셨나?"
+      }
+    ]
+  },
+  {
+    id: "story_action",
+    sceneId: "S#1",
+    title: "빗속 골목길 추격전",
+    location: "낡은 구도심 좁은 골목길 (젖은 아스팔트, 네온사인)",
+    atmosphere: "야간 · 폭우 · 차가운 청록색 조명과 네온 반사",
+    cast: "강태오, 추격자",
+    props: "깨진 우산, 쓰레기통, 물웅덩이",
+    synopsis: "쏟아지는 폭우 속에서 의문의 추격자를 피해 좁은 골목을 질주하는 태오의 필사의 탈출.",
+    updatedAt: new Date(Date.now() - 3600000).toISOString(),
+    cuts: [
+      {
+        id: "c1",
+        num: "CUT 1-1",
+        start: 0.0,
+        end: 3.0,
+        shotSize: "롱 샷",
+        fov: 84,
+        cameraMove: "트래킹",
+        subject: "강태오",
+        action: "폭우가 쏟아지는 어두운 골목길. 물웅덩이를 첨벙거리며 태오가 카메라를 향해 전력 질주한다.",
+        speaker: "",
+        dialogue: ""
+      },
+      {
+        id: "c2",
+        num: "CUT 1-2",
+        start: 3.0,
+        end: 5.5,
+        shotSize: "미디엄 클로즈업",
+        fov: 34,
+        cameraMove: "핸드헬드",
+        subject: "강태오",
+        action: "태오의 거친 숨소리와 얼굴에 튀는 빗물. 뒤를 힐끔 돌아보며 방향을 꺾는다.",
+        speaker: "강태오",
+        dialogue: "제길, 어디까지 따라붙는 거야!"
+      },
+      {
+        id: "c3",
+        num: "CUT 1-3",
+        start: 5.5,
+        end: 8.5,
+        shotSize: "풀 샷",
+        fov: 63,
+        cameraMove: "돌리 아웃",
+        subject: "강태오",
+        action: "골목 코너의 쓰레기통을 걷어차 추격자의 진로를 막아서며 좁은 계단으로 몸을 날린다.",
+        speaker: "",
+        dialogue: ""
+      },
+      {
+        id: "c4",
+        num: "CUT 1-4",
+        start: 8.5,
+        end: 12.0,
+        shotSize: "클로즈업",
+        fov: 18,
+        cameraMove: "픽스 (고정)",
+        subject: "추격자",
+        action: "검은 비옷을 입은 추격자가 쓰레기통을 짚고 멈춰 서며, 태오가 사라진 계단 위를 올려다본다.",
+        speaker: "추격자",
+        dialogue: "놓치지 않는다."
+      }
+    ]
+  },
+  {
+    id: "story_cafe",
+    sceneId: "S#3",
+    title: "비 내리는 오후의 카페",
+    location: "골목 모퉁이 앤티크 카페 창가 자리",
+    atmosphere: "오후 · 비 내림 · 따뜻한 3200K 앰버 조명 · 서정적/고요함",
+    cast: "수진, 민우",
+    props: "따뜻한 커피잔, 가죽 다이어리, 만년필, 창가의 빗방울",
+    synopsis: "오랜만에 만난 두 사람이 비 내리는 창가에서 옛 기록을 펼쳐보며 조용히 이야기를 나눈다.",
+    updatedAt: new Date(Date.now() - 7200000).toISOString(),
+    cuts: [
+      {
+        id: "c1",
+        num: "CUT 3-1",
+        start: 0.0,
+        end: 4.0,
+        shotSize: "미디엄 샷",
+        fov: 47,
+        cameraMove: "돌리 인",
+        subject: "수진",
+        action: "창밖으로 비가 흘러내리는 카페 테이블. 마주 앉은 수진과 민우 사이에 김이 모락모락 피어오르는 커피잔이 놓여 있다.",
+        speaker: "수진",
+        dialogue: "벌써 3년이나 지났네, 그때 일."
+      },
+      {
+        id: "c2",
+        num: "CUT 3-2",
+        start: 4.0,
+        end: 7.5,
+        shotSize: "익스트림 클로즈업",
+        fov: 24,
+        cameraMove: "픽스 (고정)",
+        subject: "민우",
+        action: "민우가 가죽 다이어리의 낡은 모서리를 조심스럽게 넘긴다. 손끝이 멈추는 곳에 적힌 필적.",
+        speaker: "민우",
+        dialogue: "잊으려고 했는데... 이 문장을 보니까 다시 생각나."
+      },
+      {
+        id: "c3",
+        num: "CUT 3-3",
+        start: 7.5,
+        end: 11.0,
+        shotSize: "클로즈업",
+        fov: 34,
+        cameraMove: "픽스 (고정)",
+        subject: "수진",
+        action: "수진이 커피잔을 쥐고 엷은 미소를 띠며 창밖의 비를 바라본다.",
+        speaker: "수진",
+        dialogue: "그래도 우리, 약속은 지킨 거잖아."
+      }
+    ]
+  }
+];
+
+/* ── 초기화 및 스토리지 관리 ── */
+function initApp(){
+  loadFromStorage();
+  if(!storyboards || storyboards.length === 0){
+    storyboards = JSON.parse(JSON.stringify(DEFAULT_SAMPLES));
+    saveToStorage();
+  }
+  currentId = storyboards[0].id;
+  renderStoryList();
+  loadCurrentStoryboardIntoUI();
+
+  // 단축키 설정
+  window.addEventListener('keydown', e => {
+    if((e.ctrlKey || e.metaKey) && e.key === 's'){
+      e.preventDefault();
+      saveCurrentStoryboard(true);
+    }
+  });
+}
+
+let memStorage = null;
+
+function loadFromStorage(){
+  try {
+    if(typeof localStorage !== 'undefined'){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) storyboards = JSON.parse(raw);
+    } else if(memStorage){
+      storyboards = JSON.parse(memStorage);
+    }
+  } catch(e){
+    if(memStorage) storyboards = JSON.parse(memStorage);
+  }
+}
+
+function saveToStorage(){
+  try {
+    if(typeof localStorage !== 'undefined'){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(storyboards));
+    } else {
+      memStorage = JSON.stringify(storyboards);
+    }
+  } catch(e){
+    memStorage = JSON.stringify(storyboards);
+  }
+}
+
+function getCur(){
+  return storyboards.find(s => s.id === currentId) || storyboards[0];
+}
+
+/* ── 렌더링: 사이드바 목록 ── */
+function renderStoryList(filterText = ''){
+  const el = document.getElementById('storyList');
+  document.getElementById('storyCount').textContent = storyboards.length;
+  if(!el) return;
+
+  const ft = filterText.trim().toLowerCase();
+  const list = storyboards.filter(s => {
+    if(!ft) return true;
+    return (s.sceneId && s.sceneId.toLowerCase().includes(ft)) ||
+           (s.title && s.title.toLowerCase().includes(ft)) ||
+           (s.cast && s.cast.toLowerCase().includes(ft));
+  });
+
+  if(list.length === 0){
+    el.innerHTML = '<div style="color:var(--dim2);padding:20px;text-align:center;font-size:12px">검색 결과가 없습니다</div>';
+    return;
+  }
+
+  el.innerHTML = list.map(s => {
+    const isAct = s.id === currentId;
+    const dur = calcTotalDuration(s.cuts);
+    const dateStr = formatDate(s.updatedAt);
+    return `
+      <div class="story-item ${isAct ? 'active' : ''}" onclick="selectStoryboard('${s.id}')">
+        <div class="si-head">
+          <span class="si-id">${esc(s.sceneId || '씬')}</span>
+          <span class="si-date">${dateStr}</span>
+        </div>
+        <div class="si-title">${esc(s.title || '제목 없음')}</div>
+        <div class="si-meta">
+          <span>${(s.cuts || []).length} CUTS</span>
+          <span>·</span>
+          <span>${dur}s</span>
+        </div>
+        <div class="si-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-icon" title="복제" onclick="duplicateStoryboard('${s.id}')">📋</button>
+          <button class="btn btn-icon danger" title="삭제" onclick="deleteStoryboard('${s.id}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterStoryboards(){
+  const q = document.getElementById('searchInput').value;
+  renderStoryList(q);
+}
+
+function selectStoryboard(id){
+  if(isDirty) saveCurrentStoryboard(false);
+  currentId = id;
+  renderStoryList(document.getElementById('searchInput').value);
+  loadCurrentStoryboardIntoUI();
+}
+
+/* ── UI에 현재 글콘티 로드 ── */
+function loadCurrentStoryboardIntoUI(){
+  const s = getCur();
+  if(!s) return;
+
+  document.getElementById('metaSceneId').value = s.sceneId || '';
+  document.getElementById('metaTitle').value = s.title || '';
+  document.getElementById('metaLocation').value = s.location || '';
+  document.getElementById('metaAtmosphere').value = s.atmosphere || '';
+  document.getElementById('metaCast').value = s.cast || '';
+  document.getElementById('metaProps').value = s.props || '';
+  document.getElementById('metaSynopsis').value = s.synopsis || '';
+
+  renderCastChips(s.cast);
+  renderCutCards(s.cuts || []);
+  updateSummaryInfo(s.cuts || []);
+  syncCardsToRaw(false);
+
+  setSaveStatus(false, '저장됨');
+  isDirty = false;
+}
+
+/* ── 씬 메타 수집 및 동기화 ── */
+function collectCurrentFromUI(){
+  const s = getCur();
+  if(!s) return;
+
+  s.sceneId = document.getElementById('metaSceneId').value.trim();
+  s.title = document.getElementById('metaTitle').value.trim();
+  s.location = document.getElementById('metaLocation').value.trim();
+  s.atmosphere = document.getElementById('metaAtmosphere').value.trim();
+  s.cast = document.getElementById('metaCast').value.trim();
+  s.props = document.getElementById('metaProps').value.trim();
+  s.synopsis = document.getElementById('metaSynopsis').value.trim();
+  s.updatedAt = new Date().toISOString();
+  // s.cuts 는 cutCards 입력 이벤트에서 동기화됨
+}
+
+function markChanged(){
+  isDirty = true;
+  setSaveStatus(true, '자동 저장 중...');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveCurrentStoryboard(false);
+  }, 600);
+}
+
+function saveCurrentStoryboard(showNotice = true){
+  collectCurrentFromUI();
+  saveToStorage();
+  renderStoryList(document.getElementById('searchInput').value);
+  setSaveStatus(false, '자동 저장됨');
+  isDirty = false;
+  if(showNotice) toast('글콘티가 저장되었습니다');
+}
+
+function setSaveStatus(saving, text){
+  const dot = document.getElementById('saveDot');
+  const txt = document.getElementById('saveText');
+  const sum = document.getElementById('saveSummaryInfo');
+  if(saving){
+    dot.className = 'dot saving';
+    txt.textContent = text;
+  } else {
+    dot.className = 'dot';
+    const now = new Date().toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    txt.textContent = `${text} (${now})`;
+    sum.textContent = `마지막 저장: ${now}`;
+  }
+}
+
+/* ── 인물 칩 렌더링 ── */
+function onCastChange(){
+  const val = document.getElementById('metaCast').value;
+  renderCastChips(val);
+  markChanged();
+}
+function renderCastChips(castStr){
+  const el = document.getElementById('castChips');
+  if(!el) return;
+  const names = (castStr || '').split(/[,·/]/).map(n => n.trim()).filter(Boolean);
+  el.innerHTML = names.map(n => `<span class="tag-chip">🧍 ${esc(n)}</span>`).join('');
+}
+
+/* ── 컷 카드 렌더링 & 편집 ── */
+const SHOT_SIZES = [
+  "풀 샷", "미디엄 샷", "미디엄 클로즈업", "클로즈업", "익스트림 클로즈업",
+  "롱 샷", "오버더숄더 (OTS)", "버드아이 뷰 (BEV)"
+];
+const FOV_LIST = [
+  { fov: 84, label: "84° (18mm 초광각)" },
+  { fov: 63, label: "63° (24mm 광각)" },
+  { fov: 47, label: "47° (35mm 표준)" },
+  { fov: 34, label: "34° (50mm 인물)" },
+  { fov: 24, label: "24° (70mm 준망원)" },
+  { fov: 18, label: "18° (85mm 망원)" },
+  { fov: 12, label: "12° (135mm 망원)" },
+  { fov: 107, label: "107° (초광각)" },
+  { fov: 180, label: "180° (어안)" }
+];
+const CAM_MOVES = [
+  "픽스 (고정)", "돌리 인", "돌리 아웃", "팬 좌측", "팬 우측", "틸트 업", "틸트 다운",
+  "트래킹", "핸드헬드", "크레인/붐"
+];
+
+function renderCutCards(cuts){
+  const el = document.getElementById('cutsList');
+  document.getElementById('cutCardsCount').textContent = cuts.length;
+  if(!el) return;
+
+  if(cuts.length === 0){
+    el.innerHTML = '<div style="color:var(--dim2);padding:30px;text-align:center;background:var(--panel);border:1px dashed var(--rule);border-radius:6px">컷이 없습니다. 아래 버튼을 눌러 새 컷을 추가하거나 자유 대본에서 분석하세요.</div>';
+    return;
+  }
+
+  el.innerHTML = cuts.map((c, i) => {
+    const dur = Math.max(0, (c.end - c.start)).toFixed(1);
+    return `
+      <div class="cut-card" data-id="${c.id}">
+        <div class="cut-card-head">
+          <span class="cut-num">${esc(c.num || `CUT #${i+1}`)}</span>
+          <div class="cut-tc-group">
+            <input type="number" step="0.5" min="0" value="${c.start}" onchange="updateCutField('${c.id}','start',+this.value)">초 ~
+            <input type="number" step="0.5" min="0" value="${c.end}" onchange="updateCutField('${c.id}','end',+this.value)">초
+            <span class="cut-dur-badge">${dur}s</span>
+          </div>
+          <div class="cut-card-tools">
+            <button class="btn btn-icon" title="위로 이동" onclick="moveCutCard(${i},-1)">▲</button>
+            <button class="btn btn-icon" title="아래로 이동" onclick="moveCutCard(${i},1)">▼</button>
+            <button class="btn btn-icon" title="컷 복제" onclick="duplicateCutCard('${c.id}')">📋</button>
+            <button class="btn btn-icon danger" title="컷 삭제" onclick="deleteCutCard('${c.id}')">🗑️</button>
+          </div>
+        </div>
+
+        <div class="cut-card-body">
+          <div class="cut-specs">
+            <div class="spec-box">
+              <label>샷 사이즈</label>
+              <select onchange="updateCutField('${c.id}','shotSize',this.value)">
+                ${SHOT_SIZES.map(sz => `<option value="${sz}" ${c.shotSize===sz?'selected':''}>${sz}</option>`).join('')}
+              </select>
+            </div>
+            <div class="spec-box">
+              <label>화각 (FOV)</label>
+              <select onchange="updateCutField('${c.id}','fov',+this.value)">
+                ${FOV_LIST.map(f => `<option value="${f.fov}" ${c.fov===f.fov?'selected':''}>${f.label}</option>`).join('')}
+              </select>
+            </div>
+            <div class="spec-box">
+              <label>카메라 무브</label>
+              <select onchange="updateCutField('${c.id}','cameraMove',this.value)">
+                ${CAM_MOVES.map(m => `<option value="${m}" ${c.cameraMove===m?'selected':''}>${m}</option>`).join('')}
+              </select>
+            </div>
+            <div class="spec-box">
+              <label>주 피사체 (인물)</label>
+              <input type="text" value="${esc(c.subject||'')}" placeholder="인물명" oninput="updateCutField('${c.id}','subject',this.value)">
+            </div>
+          </div>
+
+          <div class="cut-desc-box">
+            <label>지문 / 액션 / 공간 상황</label>
+            <textarea placeholder="첫 프레임 공간 배치, 인물 움직임, 감정 묘사..." oninput="updateCutField('${c.id}','action',this.value)">${esc(c.action||'')}</textarea>
+          </div>
+
+          <div class="cut-dlg-box">
+            <div class="cut-dlg-head">
+              <span>💬 대사 (Dialogue) — 선택 사항</span>
+            </div>
+            <div class="cut-dlg-inputs">
+              <input type="text" class="cut-dlg-speaker" value="${esc(c.speaker||'')}" placeholder="화자명" oninput="updateCutField('${c.id}','speaker',this.value)">
+              <input type="text" class="cut-dlg-text" value="${esc(c.dialogue||'')}" placeholder="대사 내용 입력..." oninput="updateCutField('${c.id}','dialogue',this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateCutField(cutId, field, value){
+  const s = getCur();
+  if(!s || !s.cuts) return;
+  const c = s.cuts.find(x => x.id === cutId);
+  if(c){
+    c[field] = value;
+    if(field === 'start' || field === 'end'){
+      updateSummaryInfo(s.cuts);
+      // duration 뱃지 갱신
+      const card = document.querySelector(`.cut-card[data-id="${cutId}"]`);
+      if(card){
+        const durBadge = card.querySelector('.cut-dur-badge');
+        if(durBadge) durBadge.textContent = Math.max(0, (c.end - c.start)).toFixed(1) + 's';
+      }
+    }
+    markChanged();
+  }
+}
+
+function addCutCard(){
+  const s = getCur();
+  if(!s) return;
+  if(!s.cuts) s.cuts = [];
+
+  const lastCut = s.cuts[s.cuts.length - 1];
+  const nextStart = lastCut ? lastCut.end : 0.0;
+  const nextEnd = +(nextStart + 3.5).toFixed(1);
+  const nextNum = `CUT ${s.sceneId ? s.sceneId.replace(/[^0-9]/g,'') + '-' : ''}${s.cuts.length + 1}`;
+
+  s.cuts.push({
+    id: 'cut_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+    num: nextNum,
+    start: nextStart,
+    end: nextEnd,
+    shotSize: "미디엄 샷",
+    fov: 47,
+    cameraMove: "픽스 (고정)",
+    subject: s.cast ? s.cast.split(/[,·/]/)[0].trim() : "",
+    action: "",
+    speaker: "",
+    dialogue: ""
+  });
+
+  renderCutCards(s.cuts);
+  updateSummaryInfo(s.cuts);
+  markChanged();
+}
+
+function duplicateCutCard(cutId){
+  const s = getCur();
+  if(!s || !s.cuts) return;
+  const idx = s.cuts.findIndex(c => c.id === cutId);
+  if(idx < 0) return;
+
+  const target = s.cuts[idx];
+  const copy = JSON.parse(JSON.stringify(target));
+  copy.id = 'cut_' + Date.now();
+  copy.num = copy.num + ' (사본)';
+  s.cuts.splice(idx + 1, 0, copy);
+
+  renderCutCards(s.cuts);
+  updateSummaryInfo(s.cuts);
+  markChanged();
+  toast('컷이 복제되었습니다');
+}
+
+function deleteCutCard(cutId){
+  const s = getCur();
+  if(!s || !s.cuts) return;
+  s.cuts = s.cuts.filter(c => c.id !== cutId);
+  renderCutCards(s.cuts);
+  updateSummaryInfo(s.cuts);
+  markChanged();
+}
+
+function moveCutCard(idx, direction){
+  const s = getCur();
+  if(!s || !s.cuts) return;
+  const targetIdx = idx + direction;
+  if(targetIdx < 0 || targetIdx >= s.cuts.length) return;
+
+  const tmp = s.cuts[idx];
+  s.cuts[idx] = s.cuts[targetIdx];
+  s.cuts[targetIdx] = tmp;
+
+  renderCutCards(s.cuts);
+  markChanged();
+}
+
+/* ── 컷 카드 ↔ 자유 대본 모드 동기화 및 스마트 파서 ── */
+function syncCardsToRaw(notify = true){
+  const s = getCur();
+  if(!s) return;
+  collectCurrentFromUI();
+
+  let txt = `${s.sceneId || 'S#1'} ${s.title || '제목'}\n`;
+  if(s.location) txt += `장소: ${s.location}\n`;
+  if(s.atmosphere) txt += `시간/환경: ${s.atmosphere}\n`;
+  if(s.cast) txt += `등장인물: ${s.cast}\n`;
+  if(s.props) txt += `소품: ${s.props}\n`;
+  if(s.synopsis) txt += `시놉시스: ${s.synopsis}\n`;
+  txt += `\n`;
+
+  (s.cuts || []).forEach(c => {
+    txt += `${c.num || 'CUT'} [${c.start}-${c.end}초] ${c.shotSize || '미디엄'} ${c.fov || 47}° ${c.cameraMove || '픽스'}\n`;
+    if(c.action) txt += `${c.action}\n`;
+    if(c.dialogue){
+      txt += `대사 — ${c.speaker || '인물'}: {${c.dialogue}}\n`;
+    }
+    txt += `\n`;
+  });
+
+  document.getElementById('rawScriptText').value = txt.trim();
+  if(notify) toast('컷 카드의 내용을 대본 텍스트로 동기화했습니다');
+}
+
+function syncRawToCards(){
+  parseRawScriptToCards();
+}
+
+/* 스마트 파서: 텍스트에서 씬 헤더와 컷, 대사 추출 */
+function parseRawScriptToCards(){
+  const raw = document.getElementById('rawScriptText').value;
+  if(!raw.trim()){
+    toast('파싱할 대본 텍스트가 비어 있습니다');
+    return;
+  }
+
+  const s = getCur();
+  const lines = raw.split('\n');
+
+  // 1) 씬 메타 감지
+  lines.forEach(ln => {
+    const l = ln.trim();
+    const sMatch = l.match(/^(S#?\d+)\s*(.*)/i);
+    if(sMatch && !l.includes('CUT') && !l.includes('컷')){
+      if(sMatch[1]) document.getElementById('metaSceneId').value = sMatch[1];
+      if(sMatch[2]) document.getElementById('metaTitle').value = sMatch[2].replace(/[()]/g,'').trim();
+    }
+    if(l.startsWith('장소:')) document.getElementById('metaLocation').value = l.replace('장소:','').trim();
+    if(l.startsWith('시간/환경:') || l.startsWith('시간:')) document.getElementById('metaAtmosphere').value = l.replace(/^(시간\/환경:|시간:)/,'').trim();
+    if(l.startsWith('등장인물:') || l.startsWith('인물:')){
+      const castVal = l.replace(/^(등장인물:|인물:)/,'').trim();
+      document.getElementById('metaCast').value = castVal;
+      renderCastChips(castVal);
+    }
+    if(l.startsWith('소품:')) document.getElementById('metaProps').value = l.replace('소품:','').trim();
+    if(l.startsWith('시놉시스:')) document.getElementById('metaSynopsis').value = l.replace('시놉시스:','').trim();
+  });
+
+  // 2) 컷 블록 분할
+  const cutBlocks = [];
+  let currentBlock = null;
+
+  lines.forEach(line => {
+    const l = line.trim();
+    // 컷 헤더 판별식: CUT 1, CUT #1, [CUT 1], 컷 1, S#8-1 등
+    const isCutHeader = /^(CUT|컷|SCENE|S#?\d+-\d+)/i.test(l) && !l.includes('등장인물') && !l.includes('장소');
+    if(isCutHeader){
+      if(currentBlock) cutBlocks.push(currentBlock);
+      currentBlock = { header: l, lines: [] };
+    } else if(currentBlock){
+      if(l) currentBlock.lines.push(l);
+    }
+  });
+  if(currentBlock) cutBlocks.push(currentBlock);
+
+  // 컷 파싱
+  let parsedCuts = [];
+  let currentTime = 0.0;
+
+  cutBlocks.forEach((cb, idx) => {
+    const h = cb.header;
+    // 번호
+    const numMatch = h.match(/^(CUT\s*#?[\w-]+|컷\s*\d+|S#?\d+-\d+)/i);
+    const num = numMatch ? numMatch[1].toUpperCase() : `CUT #${idx + 1}`;
+
+    // 타임코드: [0-3.5초], [0.0-3.5s], 0~3.5
+    let start = currentTime;
+    let end = +(currentTime + 3.5).toFixed(1);
+    const tcMatch = h.match(/\[?\s*([\d.]+)\s*[-~]\s*([\d.]+)\s*(?:초|s)?\s*\]?/i);
+    if(tcMatch){
+      start = parseFloat(tcMatch[1]);
+      end = parseFloat(tcMatch[2]);
+      currentTime = end;
+    } else {
+      currentTime = end;
+    }
+
+    // 샷 사이즈
+    let shotSize = "미디엄 샷";
+    if(/익스트림\s*클로즈업|ECU/i.test(h)) shotSize = "익스트림 클로즈업";
+    else if(/클로즈업|CU/i.test(h)) shotSize = "클로즈업";
+    else if(/미디엄\s*클로즈업|MCU/i.test(h)) shotSize = "미디엄 클로즈업";
+    else if(/미디엄|MS/i.test(h)) shotSize = "미디엄 샷";
+    else if(/풀\s*샷|풀샷|FS/i.test(h)) shotSize = "풀 샷";
+    else if(/롱\s*샷|롱샷|LS/i.test(h)) shotSize = "롱 샷";
+    else if(/오버더숄더|OTS/i.test(h)) shotSize = "오버더숄더 (OTS)";
+    else if(/버드아이|BEV/i.test(h)) shotSize = "버드아이 뷰 (BEV)";
+
+    // 화각 FOV
+    let fov = 47;
+    const fovMatch = h.match(/(\d+)\s*°/);
+    if(fovMatch){
+      fov = parseInt(fovMatch[1], 10);
+    } else if(shotSize === "풀 샷" || shotSize === "롱 샷") fov = 84;
+    else if(shotSize === "클로즈업") fov = 34;
+    else if(shotSize === "익스트림 클로즈업") fov = 18;
+
+    // 카메라 무브
+    let cameraMove = "픽스 (고정)";
+    if(/돌리\s*인/i.test(h)) cameraMove = "돌리 인";
+    else if(/돌리\s*아웃/i.test(h)) cameraMove = "돌리 아웃";
+    else if(/팬\s*좌/i.test(h)) cameraMove = "팬 좌측";
+    else if(/팬\s*우|팬/i.test(h)) cameraMove = "팬 우측";
+    else if(/틸트\s*업/i.test(h)) cameraMove = "틸트 업";
+    else if(/틸트\s*다운|틸트/i.test(h)) cameraMove = "틸트 다운";
+    else if(/트래킹/i.test(h)) cameraMove = "트래킹";
+    else if(/핸드헬드/i.test(h)) cameraMove = "핸드헬드";
+
+    // 지문과 대사 분리
+    let actionLines = [];
+    let speaker = "";
+    let dialogue = "";
+
+    cb.lines.forEach(ln => {
+      // 대사 패턴: 대사 — 화자: {대사}  또는 화자: "대사" 또는 화자: 대사
+      const dlgMatch1 = ln.match(/대사\s*[-—]\s*([^:]+)\s*:\s*\{([^}]+)\}/);
+      const dlgMatch2 = ln.match(/대사\s*[-—]\s*([^:]+)\s*:\s*(.*)/);
+      const dlgMatch3 = ln.match(/^([가-힣\w]+)\s*:\s*["“]?([^"”]+)["”]?$/);
+
+      if(dlgMatch1){
+        speaker = dlgMatch1[1].trim();
+        dialogue = dlgMatch1[2].trim();
+      } else if(dlgMatch2){
+        speaker = dlgMatch2[1].trim();
+        dialogue = dlgMatch2[2].replace(/[{}]/g,'').trim();
+      } else if(dlgMatch3 && !ln.includes('장소') && !ln.includes('소품')){
+        speaker = dlgMatch3[1].trim();
+        dialogue = dlgMatch3[2].trim();
+      } else {
+        actionLines.push(ln);
+      }
+    });
+
+    parsedCuts.push({
+      id: 'cut_' + Date.now() + '_' + idx,
+      num: num,
+      start: start,
+      end: end,
+      shotSize: shotSize,
+      fov: fov,
+      cameraMove: cameraMove,
+      subject: speaker || (s.cast ? s.cast.split(/[,·/]/)[0].trim() : ""),
+      action: actionLines.join(' '),
+      speaker: speaker,
+      dialogue: dialogue
+    });
+  });
+
+  if(parsedCuts.length > 0){
+    s.cuts = parsedCuts;
+    collectCurrentFromUI();
+    renderCutCards(s.cuts);
+    updateSummaryInfo(s.cuts);
+    markChanged();
+    setMode('cards');
+    toast(`대본에서 ${parsedCuts.length}개 컷을 성공적으로 분석했습니다!`);
+  } else {
+    toast('컷 헤더(예: CUT 1)를 찾지 못했습니다. 양식을 확인하세요.');
+  }
+}
+
+/* ── 프로젝트 추가, 복제, 삭제 ── */
+function createNewStoryboard(){
+  const newId = 'story_' + Date.now();
+  const newStory = {
+    id: newId,
+    sceneId: `S#${storyboards.length + 1}`,
+    title: "새 글콘티 프로젝트",
+    location: "",
+    atmosphere: "",
+    cast: "",
+    props: "",
+    synopsis: "",
+    updatedAt: new Date().toISOString(),
+    cuts: [
+      {
+        id: "c1",
+        num: "CUT 1",
+        start: 0.0,
+        end: 3.5,
+        shotSize: "풀 샷",
+        fov: 84,
+        cameraMove: "픽스 (고정)",
+        subject: "",
+        action: "첫 프레임 공간 상황 및 인물 등장...",
+        speaker: "",
+        dialogue: ""
+      }
+    ]
+  };
+
+  storyboards.unshift(newStory);
+  currentId = newId;
+  saveToStorage();
+  renderStoryList();
+  loadCurrentStoryboardIntoUI();
+  toast('새 글콘티가 생성되었습니다');
+}
+
+function duplicateStoryboard(id){
+  const target = storyboards.find(s => s.id === id);
+  if(!target) return;
+  const copy = JSON.parse(JSON.stringify(target));
+  copy.id = 'story_' + Date.now();
+  copy.title = (copy.title || '글콘티') + ' (사본)';
+  copy.updatedAt = new Date().toISOString();
+  storyboards.unshift(copy);
+  currentId = copy.id;
+  saveToStorage();
+  renderStoryList();
+  loadCurrentStoryboardIntoUI();
+  toast('글콘티가 복제되었습니다');
+}
+
+function deleteStoryboard(id){
+  if(storyboards.length <= 1){
+    toast('최소 1개의 글콘티가 유지되어야 합니다');
+    return;
+  }
+  if(!confirm('정말 이 글콘티를 삭제하시겠습니까?')) return;
+
+  storyboards = storyboards.filter(s => s.id !== id);
+  if(currentId === id) currentId = storyboards[0].id;
+  saveToStorage();
+  renderStoryList();
+  loadCurrentStoryboardIntoUI();
+  toast('글콘티가 삭제되었습니다');
+}
+
+function confirmResetAll(){
+  if(!confirm('모든 글콘티를 표준 기본 예제로 초기화하시겠습니까? 기존 작업이 덮어씌워집니다.')) return;
+  storyboards = JSON.parse(JSON.stringify(DEFAULT_SAMPLES));
+  currentId = storyboards[0].id;
+  saveToStorage();
+  renderStoryList();
+  loadCurrentStoryboardIntoUI();
+  toast('기본 예제로 초기화되었습니다');
+}
+
+/* ── 예제 선택 ── */
+function openSampleSelector(){
+  document.getElementById('sampleModal').classList.add('open');
+}
+function closeSampleModal(){
+  document.getElementById('sampleModal').classList.remove('open');
+}
+function loadSamplePreset(key){
+  closeSampleModal();
+  let sample = null;
+  if(key === 's8') sample = DEFAULT_SAMPLES[0];
+  else if(key === 'action') sample = DEFAULT_SAMPLES[1];
+  else if(key === 'cafe') sample = DEFAULT_SAMPLES[2];
+  else if(key === 'blank'){
+    createNewStoryboard();
+    return;
+  }
+  if(!sample) return;
+
+  const copy = JSON.parse(JSON.stringify(sample));
+  copy.id = 'story_' + Date.now();
+  copy.updatedAt = new Date().toISOString();
+  storyboards.unshift(copy);
+  currentId = copy.id;
+  saveToStorage();
+  renderStoryList();
+  loadCurrentStoryboardIntoUI();
+  toast(`'${copy.title}' 예제를 불러왔습니다`);
+}
+
+/* ── 모드 전환 ── */
+function setMode(mode){
+  const btnCards = document.getElementById('btnModeCards');
+  const btnRaw = document.getElementById('btnModeRaw');
+  const secCards = document.getElementById('secCardsMode');
+  const secRaw = document.getElementById('secRawMode');
+
+  if(mode === 'cards'){
+    btnCards.classList.add('on');
+    btnRaw.classList.remove('on');
+    secCards.classList.add('on');
+    secRaw.classList.remove('on');
+  } else {
+    btnRaw.classList.add('on');
+    btnCards.classList.remove('on');
+    secRaw.classList.add('on');
+    secCards.classList.remove('on');
+    syncCardsToRaw(false);
+  }
+}
+
+/* ── 요약 정보 계산 ── */
+function calcTotalDuration(cuts){
+  if(!cuts || cuts.length === 0) return "0.0";
+  const maxEnd = Math.max(...cuts.map(c => Number(c.end) || 0));
+  return maxEnd.toFixed(1);
+}
+
+function updateSummaryInfo(cuts){
+  const dur = calcTotalDuration(cuts);
+  document.getElementById('runtimeSummary').textContent = `총 ${cuts.length} CUTS · ${dur}s`;
+}
+
+function formatDate(isoStr){
+  if(!isoStr) return '';
+  const d = new Date(isoStr);
+  const now = new Date();
+  const diffM = Math.floor((now - d) / 60000);
+  if(diffM < 1) return '방금 전';
+  if(diffM < 60) return `${diffM}분 전`;
+  const diffH = Math.floor(diffM / 60);
+  if(diffH < 24) return `${diffH}시간 전`;
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
+/* ── XCONDA scene-v1 규격 JSON 변환기 ── */
+function buildXcondaSceneV1(story){
+  const sceneId = (story.sceneId || 'S#1').replace('#', '');
+  const title = story.title || '무제';
+  const castList = (story.cast || '').split(/[,·/]/).map(c => c.trim()).filter(Boolean);
+  const propList = (story.props || '').split(/[,·/]/).map(p => p.trim()).filter(Boolean);
+  const cuts = story.cuts || [];
+  const totalDur = parseFloat(calcTotalDuration(cuts));
+
+  // 인물 레퍼런스 생성
+  const characters = castList.map((name, i) => ({
+    tag: `@Image${i + 1}`,
+    id: `actor_${i + 1}`,
+    name: name,
+    role: `${name} (등장인물)`
+  }));
+
+  // 배경 레퍼런스 생성
+  const bgTag = `@Image${characters.length + 1}`;
+  const backgrounds = [
+    {
+      tag: bgTag,
+      name: story.location || "기준 공간",
+      refImage: "location_bg.jpg",
+      note: `${story.location || '공간'} — ${story.atmosphere || '기준 조명'}`
+    }
+  ];
+
+  // 소품 레퍼런스
+  const props = propList.map((prop, i) => ({
+    tag: `@Image${characters.length + backgrounds.length + i + 1}`,
+    name: prop,
+    refImage: "prop_reference.jpg",
+    note: `${prop} 세트/소품`
+  }));
+
+  // 파트 블로킹 & 카메라 & 프롬프트 생성
+  const appears = characters.map(c => c.id);
+  const blocking = {};
+  characters.forEach((c, idx) => {
+    blocking[c.id] = {
+      x: idx * 40,
+      y: 0,
+      angle: 0,
+      pose: "서다",
+      path: []
+    };
+  });
+
+  const cameras = cuts.map((c, i) => ({
+    cutRef: c.num || `CUT${i + 1}`,
+    x: 0,
+    y: 80,
+    target: [0, 0],
+    fov: c.fov || 47,
+    shotSize: c.shotSize || "미디엄 샷",
+    subject: characters[0] ? characters[0].id : null,
+    angle: 0
+  }));
+
+  const promptCuts = cuts.map((c, i) => {
+    const timecode = `${c.start}-${c.end}초`;
+    const label = `${c.num || `CUT ${i+1}`} · ${c.shotSize || '미디엄'} ${c.fov || 47}°`;
+    let ko = `${timecode} — ${c.num || `CUT ${i+1}`}. 첫 프레임 공간 — ${c.subject || '인물'} 프레임 중앙 중경. ${c.action || ''}`;
+    let en = `${c.start}-${c.end}s — ${c.num || `CUT ${i+1}`}. FIRST FRAME SPACE — ${c.subject || 'Subject'} frame-center in the midground. ${c.action || ''}`;
+
+    if(c.dialogue){
+      ko += `\n대사 — ${c.speaker || '인물'}: {${c.dialogue}}`;
+      en += `\nDialogue — ${c.speaker || 'Speaker'}: {${c.dialogue}}`;
+    }
+
+    return {
+      tc: timecode,
+      lb: label,
+      dlg: c.dialogue || "",
+      speaker: c.speaker || "",
+      dlgPlain: c.dialogue || "",
+      ko: ko,
+      en: en
+    };
+  });
+
+  return {
+    schema: "xconda-scene-v1",
+    sceneId: story.sceneId || "S#1",
+    title: title,
+    model: "Seedance 2.5",
+    room: {
+      id: "room_main",
+      kind: "indoor",
+      name: story.location || "공간",
+      center: [0.0, 0.0],
+      width: 9.0,
+      depth: 7.0,
+      height: 2.7,
+      obstacles: [],
+      portals: []
+    },
+    refs: {
+      characters: characters,
+      backgrounds: backgrounds,
+      props: props,
+      audio: [],
+      video: []
+    },
+    parts: [
+      {
+        partId: "A",
+        title: title,
+        duration: totalDur,
+        mode: "멀티컷",
+        appears: appears,
+        usesRefs: [
+          ...characters.map(c => c.tag),
+          ...backgrounds.map(b => b.tag)
+        ],
+        blocking: blocking,
+        cameras: cameras,
+        prompt: {
+          meta: { ver: "v1", level: "LEVEL 2" },
+          blocks: [
+            {
+              n: "01",
+              t: "장면 컨텍스트",
+              tEn: "SCENE CONTEXT",
+              ko: `${bgTag} — ${story.location || '공간'}. ${story.synopsis || title}.`,
+              en: `${bgTag} — ${story.location || 'Location'}. ${story.synopsis || title}.`
+            },
+            {
+              n: "02",
+              t: "레퍼런스 / 범례",
+              tEn: "ACTIVE REFERENCES",
+              ko: `이 파트의 레퍼런스 순서입니다 — 인물(${castList.join('·')}) → 배경(${story.location || '공간'}).`,
+              en: `Active reference upload order — characters (${castList.join(', ')}) → backgrounds.`
+            },
+            {
+              n: "03",
+              t: "시네마틱 셋업",
+              tEn: "LOCATION MAP AND LIGHTING",
+              ko: `${story.location || '공간'}. ${story.atmosphere || '실내 조명'}.`,
+              en: `${story.location || 'Location'}. ${story.atmosphere || 'Indoor lighting'}.`
+            },
+            {
+              n: "04",
+              t: "옵틱스·카메라·포맷",
+              tEn: "FORMAT MODE / OPTICS / CAMERA",
+              ko: `모드: 멀티컷. 구간 중 드리프트 없음. 인물 얼굴은 프레임 중앙에 크게 잡힌다.`,
+              en: `Mode: multi-cut. No drift within the section. Speaker face stays centered in frame.`
+            },
+            {
+              n: "05",
+              t: "텍스트 락·소품·의상",
+              tEn: "PROP AND WARDROBE LOCK",
+              ko: `소품 및 의상 형태 고정: ${story.props || '주요 소품'}.`,
+              en: `Prop and wardrobe lock: ${story.props || 'Main props'}.`
+            },
+            {
+              n: "06",
+              t: "퍼포먼스·상태 오버레이",
+              tEn: "PERFORMANCE",
+              ko: `[자세] 인물들은 주어진 감정선과 긴장감을 유지하며 컷을 전환한다.`,
+              en: `[POSTURE] Characters maintain emotional tension across cuts.`
+            },
+            {
+              n: "07",
+              t: "배경 인물 명세",
+              tEn: "BACKGROUND CAST",
+              ko: `주요 인물 외 배경 인물 없음.`,
+              en: `No background crowd.`
+            },
+            {
+              n: "08",
+              t: "초 단위 타임라인",
+              tEn: "ACTION TIMELINE",
+              cuts: true,
+              headKo: "[초 단위 타임라인] 대사는 각 컷 안에 '대사 — 화자: {대사}' 라벨 줄로 표기한다.",
+              headEn: "[ACTION TIMELINE] Dialogue is labeled inside each cut as 'Dialogue — Speaker: {line}'."
+            },
+            {
+              n: "09",
+              t: "스타일 & 출력",
+              tEn: "STYLE / OUTPUT SETTINGS",
+              ko: `시네마틱 실사 영화 질감, 4K 정밀 디테일, 일관된 피사체 정체성 유지.`,
+              en: `Photorealistic cinematic texture, 4K crisp detail, stable identity lock.`
+            },
+            {
+              n: "10",
+              t: "포지티브 락",
+              tEn: "POSITIVE LOCKS",
+              ko: `인물 얼굴·의상·공간 구조 유지. 자막·워터마크 없음.`,
+              en: `Positive lock on face, wardrobe, and space. No captions, no watermark.`
+            }
+          ],
+          cuts: promptCuts
+        }
+      }
+    ]
+  };
+}
+
+/* ── JSON 모달 & 복사 & 다운로드 ── */
+let currentGeneratedJson = null;
+
+function openJsonModal(){
+  collectCurrentFromUI();
+  const s = getCur();
+  currentGeneratedJson = buildXcondaSceneV1(s);
+  const jsonStr = JSON.stringify(currentGeneratedJson, null, 2);
+  document.getElementById('jsonModalCode').textContent = jsonStr;
+  document.getElementById('jsonModal').classList.add('open');
+}
+
+function closeJsonModal(){
+  document.getElementById('jsonModal').classList.remove('open');
+}
+
+function copyGeneratedJson(){
+  if(!currentGeneratedJson) return;
+  const str = JSON.stringify(currentGeneratedJson, null, 2);
+  cp(str, 'XCONDA 씬 JSON이 클립보드에 복사되었습니다');
+}
+
+function downloadGeneratedJson(){
+  if(!currentGeneratedJson) return;
+  const str = JSON.stringify(currentGeneratedJson, null, 2);
+  const s = getCur();
+  const filename = `xconda_scene_${(s.sceneId||'scene').replace('#','')}.json`;
+  downloadFile(str, filename, 'application/json');
+}
+
+/* ── XCONDA 에디터(Engine)로 바로 전송하여 열기 ── */
+function launchInEngine(){
+  collectCurrentFromUI();
+  const s = getCur();
+  const sceneJson = buildXcondaSceneV1(s);
+  // localStorage의 전달용 임시 키에 저장
+  try {
+    sessionStorage.setItem('XCONDA_IMPORT_SCENE', JSON.stringify(sceneJson));
+  } catch(e){}
+
+  toast('XCONDA 에디터를 불러옵니다...');
+  setTimeout(() => {
+    window.location.href = '/?import=session';
+  }, 350);
+}
+
+/* ── 클립보드 복사 유틸 ── */
+function copyCleanScript(){
+  collectCurrentFromUI();
+  const s = getCur();
+  let txt = `[글콘티 / 대본] ${s.sceneId || '씬'} · ${s.title || '제목'}\n`;
+  txt += `장소: ${s.location || '미정'}\n시간/무드: ${s.atmosphere || '미정'}\n등장인물: ${s.cast || '미정'}\n\n`;
+
+  (s.cuts || []).forEach(c => {
+    txt += `----------------------------------------\n`;
+    txt += `${c.num || 'CUT'} [${c.start}-${c.end}초 | ${c.shotSize} | ${c.fov}° | ${c.cameraMove}]\n`;
+    if(c.action) txt += `지문: ${c.action}\n`;
+    if(c.dialogue) txt += `대사: ${c.speaker ? c.speaker + ' : ' : ''}"${c.dialogue}"\n`;
+  });
+  txt += `----------------------------------------\n`;
+
+  cp(txt, '정리된 대본이 복사되었습니다');
+}
+
+function copyClaudePromptRequest(){
+  collectCurrentFromUI();
+  const s = getCur();
+  let req = `이 글콘티를 바탕으로 XCONDA Seedance 10블록 영상 프롬프트와 씬 JSON을 만들어줘.\n\n`;
+  req += `씬: ${s.sceneId || 'S#1'} ${s.title || ''}\n`;
+  req += `공간: ${s.location || ''}\n`;
+  req += `조명/환경: ${s.atmosphere || ''}\n`;
+  req += `등장인물: ${s.cast || ''}\n`;
+  req += `소품: ${s.props || ''}\n\n`;
+  req += `[컷별 글콘티 내용]\n`;
+  (s.cuts || []).forEach(c => {
+    req += `· ${c.num} [${c.start}-${c.end}초]: (${c.shotSize}, ${c.fov}°, ${c.cameraMove}) ${c.action}`;
+    if(c.dialogue) req += ` / 대사 — ${c.speaker}: "${c.dialogue}"`;
+    req += `\n`;
+  });
+
+  cp(req, 'Claude 프롬프트 생성 요청문이 복사되었습니다');
+}
+
+function downloadTxtFile(){
+  collectCurrentFromUI();
+  const s = getCur();
+  let txt = `[XCONDA 글콘티] ${s.sceneId || 'S#1'} ${s.title || ''}\n\n`;
+  txt += `장소: ${s.location || ''}\n환경: ${s.atmosphere || ''}\n등장인물: ${s.cast || ''}\n소품: ${s.props || ''}\n\n`;
+  (s.cuts || []).forEach(c => {
+    txt += `${c.num} [${c.start}-${c.end}s] ${c.shotSize} ${c.fov}° ${c.cameraMove}\n`;
+    if(c.action) txt += `${c.action}\n`;
+    if(c.dialogue) txt += `대사 — ${c.speaker}: {${c.dialogue}}\n`;
+    txt += `\n`;
+  });
+
+  const filename = `storyboard_${(s.sceneId||'scene').replace('#','')}.txt`;
+  downloadFile(txt, filename, 'text/plain');
+}
+
+function downloadJsonFile(){
+  collectCurrentFromUI();
+  const s = getCur();
+  const filename = `storyboard_${(s.sceneId||'scene').replace('#','')}.json`;
+  downloadFile(JSON.stringify(s, null, 2), filename, 'application/json');
+}
+
+function exportAllBackup(){
+  collectCurrentFromUI();
+  saveToStorage();
+  const filename = `xconda_all_storyboards_backup_${new Date().toISOString().slice(0,10)}.json`;
+  downloadFile(JSON.stringify(storyboards, null, 2), filename, 'application/json');
+  toast('전체 글콘티 백업 파일이 다운로드되었습니다');
+}
+
+function triggerFileInput(){
+  document.getElementById('fileUploadInput').click();
+}
+
+function handleFileUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const content = reader.result;
+    if(file.name.endsWith('.json')){
+      try {
+        const parsed = JSON.parse(content);
+        if(Array.isArray(parsed)){
+          storyboards = parsed;
+          currentId = storyboards[0].id;
+        } else if(parsed.cuts || parsed.sceneId){
+          parsed.id = 'story_' + Date.now();
+          storyboards.unshift(parsed);
+          currentId = parsed.id;
+        } else {
+          toast('인식할 수 없는 JSON 형식입니다');
+          return;
+        }
+        saveToStorage();
+        renderStoryList();
+        loadCurrentStoryboardIntoUI();
+        toast('JSON 파일을 불러왔습니다');
+      } catch(err){
+        toast('JSON 파싱 오류: ' + err.message);
+      }
+    } else {
+      // 텍스트/마크다운 파일
+      document.getElementById('rawScriptText').value = content;
+      setMode('raw');
+      parseRawScriptToCards();
+      toast('대본 텍스트 파일을 불러와 분석했습니다');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+/* ── 유틸리티 ── */
+function esc(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function cp(text, msg){
+  const fnFallback = () => {
+    const a = document.createElement('textarea');
+    a.value = text;
+    a.style.position = 'fixed';
+    a.style.opacity = '0';
+    document.body.appendChild(a);
+    a.select();
+    try { document.execCommand('copy'); } catch(e){}
+    a.remove();
+    toast(msg);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(() => toast(msg)).catch(fnFallback);
+  } else {
+    fnFallback();
+  }
+}
+function downloadFile(content, filename, type){
+  const blob = new Blob([content], { type: `${type};charset=utf-8` });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._x);
+  t._x = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// 초기 실행
+window.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
