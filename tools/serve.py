@@ -35,6 +35,30 @@ MISSING = """<!doctype html>
 </body>"""
 
 
+def embedded_scene():
+    """index.html에 심긴 EMBEDDED_SCENE를 꺼낸다.
+
+    output/S8_scene.json 은 .gitignore 대상이라 새로 클론하면 없다. 그래도 씬은
+    index.html 안에 심겨 있으므로 거기서 뽑아 /scene 을 살린다 — UI가 보이는 상태면
+    /scene 도 반드시 살아야 한다.
+    """
+    if not os.path.exists(EDITOR):
+        return None
+    src = open(EDITOR, encoding="utf-8").read()
+    key = "const EMBEDDED_SCENE = "
+    i = src.find(key)
+    if i < 0:
+        return None
+    body = src[i + len(key):]
+    if body.startswith("{}"):                      # 씬이 안 심긴 빈 템플릿
+        return None
+    try:
+        obj, _end = json.JSONDecoder().raw_decode(body)
+    except ValueError:
+        return None
+    return obj if isinstance(obj, dict) and obj.get("schema") else None
+
+
 class Handler(SimpleHTTPRequestHandler):
     """저장소 파일을 그대로 주되, `/` 는 편집기 UI로 치환한다."""
 
@@ -49,12 +73,21 @@ class Handler(SimpleHTTPRequestHandler):
             return self._send_file(os.path.join(SKILL, "assets", "xconda_engine.html"),
                                    "text/html; charset=utf-8")
         if path == "/scene":
-            return self._send_file(SCENE, "application/json; charset=utf-8")
+            if os.path.exists(SCENE):
+                return self._send_file(SCENE, "application/json; charset=utf-8")
+            data = embedded_scene()               # output/이 없으면 index.html에서 뽑는다
+            if data is not None:
+                return self._send_bytes(json.dumps(data, ensure_ascii=False, indent=1).encode("utf-8"),
+                                        "application/json; charset=utf-8")
+            return self._send_bytes(
+                '{"error":"씬을 찾을 수 없습니다. make engine-html 를 실행하세요"}'.encode("utf-8"),
+                "application/json; charset=utf-8", 404)
         if path == "/__status":
             body = json.dumps({
                 "editor_html": os.path.exists(EDITOR),
                 "editor_bytes": os.path.getsize(EDITOR) if os.path.exists(EDITOR) else 0,
                 "scene_json": os.path.exists(SCENE),
+                "scene_from_editor": embedded_scene() is not None,
                 "engine_template": os.path.exists(os.path.join(SKILL, "assets", "xconda_engine.html")),
             }, ensure_ascii=False)
             return self._send_bytes(body.encode("utf-8"), "application/json; charset=utf-8")

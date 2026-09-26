@@ -28,7 +28,7 @@ make check-scene S=tests/fixtures/scene_v1_sample.json   # 예제 씬 블로킹 
 |---|---|
 | `/` | 편집기 UI — S8 씬 내장, 열자마자 파트 5개·컷 패널·10블록 프롬프트가 보임 |
 | `/engine` | 스킬 원본 편집기 템플릿 — 빈 화면, 씬 JSON 드롭용 |
-| `/scene` | 현재 UI에 심긴 씬 JSON |
+| `/scene` | 현재 UI에 심긴 씬 JSON — `output/`이 없으면 `index.html`에서 뽑아준다(신규 클론에서도 200) |
 | `/__status` | 서버·파일 상태 (스크립트 점검용) |
 
 ## v9.13.1 — "웹에서 UI가 안 보임" 고친 것
