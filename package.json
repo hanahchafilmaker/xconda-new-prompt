@@ -1,7 +1,7 @@
 {
   "name": "xconda-new-prompt-web",
   "private": true,
-  "version": "9.13.1",
+  "version": "9.14.0",
   "description": "XCONDA 편집기 UI 스모크 테스트용 dev 의존성 (jsdom). make setup-web 으로 설치.",
   "type": "module",
   "devDependencies": {
