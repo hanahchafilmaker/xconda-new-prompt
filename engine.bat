@@ -18,18 +18,33 @@ cd /d "%~dp0"
 set "PORT=%~1"
 if not defined PORT set "PORT=8080"
 
-rem --- Python 3 찾기: py 런처 > python > python3 ---
+rem --- Python 3 찾기: 후보를 직접 실행해 보고 실제 동작하는 것을 고른다 ---
+rem     (PATH 에 있는 python 이 손상되어 "Unable to create process" 오류를
+rem      내는 경우를 걸러낸다)
 set "PY="
-where py >nul 2>nul && set "PY=py -3"
-if not defined PY where python >nul 2>nul && set "PY=python"
-if not defined PY where python3 >nul 2>nul && set "PY=python3"
-if not defined PY (
-    echo [오류] Python 3 를 찾을 수 없습니다.
-    echo        https://www.python.org/downloads/ 에서 설치한 뒤 다시 실행하세요.
-    echo        설치 시 "Add python.exe to PATH" 체크를 권장합니다.
-    exit /b 1
-)
+call :try_python "py -3"   && goto :python_found
+call :try_python "py"      && goto :python_found
+call :try_python "python"  && goto :python_found
+call :try_python "python3" && goto :python_found
 
+echo [오류] 실행 가능한 Python 3 를 찾을 수 없습니다.
+echo        설치된 python 이 손상되었을 가능성이 있습니다. 아래 순서로 해결하세요.
+echo.
+echo        1. 새 Python 설치 관리자를 쓰고 있다면:
+echo              py list            설치된 런타임 목록 확인
+echo              py install 3.14    런타임 다시 내려받기
+echo              py -3 --version    동작 확인
+echo.
+echo        2. 그래도 안 되면 정식 설치 관리자로 재설치:
+echo              https://www.python.org/downloads/
+echo              설치 화면에서 "Add python.exe to PATH" 체크 권장
+echo.
+echo        참고: 서버 없이 편집기 화면만 보려면 index.html 을 더블클릭해도 된다.
+exit /b 1
+
+:python_found
+echo 사용할 Python: %PY%
+echo.
 echo [1/2] 편집기 UI 빌드 (tools\build_editor.py)...
 %PY% tools\build_editor.py
 if errorlevel 1 (
@@ -47,3 +62,12 @@ echo   씬 JSON    : http://localhost:%PORT%/scene
 echo.
 start "" http://localhost:%PORT%/
 %PY% tools\serve.py %PORT%
+exit /b 0
+
+:try_python
+rem 인자로 받은 명령이 실제로 Python 을 실행할 수 있는지 검사한다.
+rem 실패하면 1, 성공하면 PY 를 설정하고 0 을 반환한다.
+%~1 -c "import sys" >nul 2>nul
+if errorlevel 1 exit /b 1
+set "PY=%~1"
+exit /b 0
