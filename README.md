@@ -21,6 +21,23 @@ make setup-web      # UI 테스트용 jsdom 설치 (처음 한 번)
 make check-scene S=tests/fixtures/scene_v1_sample.json   # 예제 씬 블로킹 검수 → "문제 0건"
 ```
 
+### Windows — `make` 없이 실행
+
+`make` 가 없는 Windows 에서는 **`engine.bat`** 을 쓰면 된다 (Python 3 필요 — `py` → `python` → `python3`
+순서로 자동 탐지). 탐색기에서 더블클릭하거나 PowerShell/cmd 에서:
+
+```powershell
+.\engine.bat            # 빌드 + http://localhost:8080/ 서버 시작 (브라우저 자동 열림)
+.\engine.bat 3000       # 포트 지정
+```
+
+`make engine` 의 두 단계를 직접 실행하는 것과 동일하다:
+
+```powershell
+python tools\build_editor.py    # ① 편집기 UI 빌드 (output/ → index.html)
+python tools\serve.py 8080      # ② 서버 실행 (정지: Ctrl+C)
+```
+
 `make engine` 을 띄우면 **루트(`/`)를 여는 것만으로 씬이 이미 심긴 편집기 화면이 나온다.**
 씬 JSON을 직접 끌어다 넣고 싶을 때만 `/engine`(빈 편집기)을 연다.
 
