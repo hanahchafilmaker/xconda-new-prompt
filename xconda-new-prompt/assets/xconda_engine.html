@@ -16,6 +16,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--kr);font-size:14px;
 #drop{border:2px dashed var(--rule);background:var(--panel);border-radius:8px;padding:70px 20px;text-align:center;color:var(--dim);cursor:pointer;margin:22px 0}
 #drop.over{border-color:var(--y);background:#1a1710;color:var(--ink)}
 #drop b{color:var(--y)} #drop .sub{font-size:12px;color:var(--dim2);margin-top:8px}
+.head-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.source-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 0;padding:9px 12px;border:1px solid var(--rule);background:var(--panel);border-radius:5px;font-size:11.5px;color:var(--dim)}
+.source-strip b{font-family:var(--mono);font-size:10px;color:var(--y)}
+.source-pill{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ok)}
+.source-pill.dirty{color:var(--y)}
 /* 파트 탭 */
 .tabs{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap}
 .tab{border:1px solid var(--rule);background:var(--panel);color:var(--dim);padding:7px 16px;cursor:pointer;font-family:var(--kr);font-size:13px;border-radius:4px}
@@ -47,6 +52,17 @@ body{background:var(--bg);color:var(--ink);font-family:var(--kr);font-size:14px;
 .panel-svg svg{display:block;width:100%;height:auto}
 .panel-lb{font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-top:5px;text-align:center}
 .panel-pos{font-size:10.5px;line-height:1.45;color:var(--ink);margin-top:4px;text-align:left}
+/* 프롬프트 직접 수정 도구 */
+.direct-tools{padding:14px;display:flex;flex-direction:column;gap:12px}
+.direct-note{font-size:12px;color:var(--dim);line-height:1.7}
+.direct-note strong{color:var(--ink)}
+.lock-grid{display:grid;grid-template-columns:minmax(190px,1.35fr) repeat(3,minmax(120px,.75fr)) minmax(150px,1fr) auto;gap:8px;align-items:end}
+.tool-field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.tool-field label,.lang-lb{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--dim);text-transform:uppercase}
+.tool-field select{width:100%;height:34px;background:#0d0d0d;border:1px solid var(--rule);border-radius:4px;color:var(--ink);padding:0 9px;font-family:var(--kr);font-size:12px;outline:none}
+.tool-field select:focus{border-color:var(--y)}
+.lock-preview{border-left:2px solid var(--y-dim);background:#0d0d0d;padding:9px 11px;font-size:11px;color:var(--dim);white-space:pre-wrap;line-height:1.6}
+.lock-preview b{color:var(--y);font-family:var(--mono);font-size:9.5px}
 /* 프롬프트 블록 */
 .blk{border:1px solid var(--rule);background:var(--panel);margin-top:12px}
 .blk-h{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--panel2);cursor:pointer;border-left:3px solid var(--y)}
@@ -55,9 +71,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--kr);font-size:14px;
 .blk-h .car{margin-left:auto;font-size:9px;color:var(--dim2)}
 .blk.fold .car{transform:rotate(-90deg)} .blk.fold .body{display:none}
 .pane{background:var(--panel)}
-.pane textarea{width:100%;background:#0d0d0d;border:0;border-top:1px solid var(--rule);color:var(--ink);
-font-family:var(--mono);font-size:12px;line-height:1.8;padding:8px 14px;resize:vertical;outline:none}
-.pane textarea:focus{background:#151515}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--rule)}
+.lang-pane{min-width:0;background:#0d0d0d}
+.lang-pane+.lang-pane{border-left:1px solid var(--rule)}
+.lang-lb{display:block;padding:6px 14px 0;color:var(--y-dim)}
+.lang-pane textarea{width:100%;background:transparent;border:0;color:var(--ink);font-family:var(--mono);font-size:12px;line-height:1.75;padding:5px 14px 9px;resize:vertical;outline:none}
+.lang-pane textarea:focus{background:#151515}
 .cut-h{padding:7px 14px;background:#151510;font-family:var(--mono);font-size:11px;color:var(--y-dim);border-top:1px solid var(--rule)}
 .cut-h .dlg{color:var(--y);margin-left:8px}
 /* 검수 */
@@ -74,24 +93,33 @@ font-family:var(--mono);font-size:12px;line-height:1.8;padding:8px 14px;resize:v
 .hint2{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--dim2)}
 .toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--y);color:#0A0A0A;padding:9px 20px;font-size:12.5px;font-weight:700;border-radius:4px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:900px){.board-grid{grid-template-columns:1fr}}
+@media(max-width:1080px){.lock-grid{grid-template-columns:repeat(3,1fr)}.lock-grid .btn{height:34px}}
+@media(max-width:900px){.board-grid{grid-template-columns:1fr}.lang-grid{grid-template-columns:1fr}.lang-pane+.lang-pane{border-left:0;border-top:1px solid var(--rule)}.head-actions{width:100%;margin-left:0}.source-pill{width:100%;margin-left:0}}
+@media(max-width:620px){.lock-grid{grid-template-columns:1fr}.bar-in .btn{flex:1}.hint2{width:100%;margin-left:0}.wrap{padding:0 12px}}
 </style>
 <div class="wrap">
   <div class="head">
     <span class="brand">XCONDA ENGINE · SCENE-V1 · KO</span>
     <span class="slug" id="hSlug">XCONDA ENGINE</span>
     <span class="meta" id="hMeta">씬 JSON을 드롭하세요</span>
-    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <a href="/storyboard" class="btn sm pri" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px">📝 글콘티 작업실 (스토리보드)</a>
+    <div class="head-actions">
+      <button class="btn sm" type="button" onclick="openSourcePicker()">↥ HTML / JSON 열기</button>
+      <button class="btn sm" type="button" id="saveHtmlBtn" onclick="downloadEditedHtml()">↓ 수정본 HTML 저장</button>
+      <a href="/storyboard" class="btn sm pri" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px">📝 글콘티 작업실</a>
     </div>
   </div>
 
   <div id="drop">
-    <div><b>씬 데이터 JSON</b>을 여기에 끌어다 놓거나 클릭해서 선택하세요</div>
-    <div class="sub">scene_*.json · xconda-scene-v1 형식</div>
-    <input type="file" id="fileInput" accept=".json" style="display:none">
+    <div>Claude에서 받은 <b>HTML 편집기</b> 또는 <b>씬 JSON</b>을 여기에 놓으세요</div>
+    <div class="sub">.html · .htm · .json — HTML 안의 EMBEDDED_SCENE을 안전하게 꺼내며 외부 스크립트는 실행하지 않습니다</div>
+    <input type="file" id="fileInput" accept=".html,.htm,.json,text/html,application/json" style="display:none">
   </div>
 
+  <div class="source-strip" id="sourceStrip" style="display:none">
+    <b>SOURCE</b><span id="sourceName">내장 씬</span>
+    <span>· 한글과 영문을 여기서 바로 고치고 HTML로 다시 저장할 수 있습니다.</span>
+    <span class="source-pill" id="saveState">저장할 변경 없음</span>
+  </div>
   <div class="tabs" id="tabs"></div>
   <div class="stage" id="stage">
     <!-- 등장인물/레퍼런스 + 컷별 패널 -->
@@ -108,9 +136,25 @@ font-family:var(--mono);font-size:12px;line-height:1.8;padding:8px 14px;resize:v
         </div>
       </div>
     </div>
+    <!-- Claude 없이 넣는 규칙 기반 프롬프트 수정 -->
+    <div class="sec" id="secDirect">
+      <div class="sec-h" onclick="this.parentElement.classList.toggle('fold')"><span class="n">DIRECT EDIT</span><span class="t">위치 고정 레퍼런스 넣기</span><span class="hint">한/영 동시 생성 · Claude 불필요</span></div>
+      <div class="body direct-tools">
+        <div class="direct-note"><strong>레퍼런스와 화면 위치를 고르면</strong> 현재 컷 또는 파트 전체에 같은 의미의 한국어·영문 POSITION LOCK을 함께 넣습니다. 기존에 이 도구로 넣은 같은 레퍼런스 락은 중복하지 않고 교체합니다.</div>
+        <div class="lock-grid">
+          <div class="tool-field"><label for="lockRef">Reference</label><select id="lockRef" onchange="updateLockPreview()"></select></div>
+          <div class="tool-field"><label for="lockHorizontal">Frame</label><select id="lockHorizontal" onchange="updateLockPreview()"><option value="left">왼쪽</option><option value="center" selected>중앙</option><option value="right">오른쪽</option></select></div>
+          <div class="tool-field"><label for="lockDepth">Depth</label><select id="lockDepth" onchange="updateLockPreview()"><option value="foreground">전경</option><option value="midground" selected>중경</option><option value="background">후경</option></select></div>
+          <div class="tool-field"><label for="lockScope">Scope</label><select id="lockScope" onchange="updateLockScope()"><option value="part">파트 전체</option><option value="cut">특정 컷</option></select></div>
+          <div class="tool-field"><label for="lockCut">Cut</label><select id="lockCut" disabled onchange="updateLockPreview()"></select></div>
+          <button class="btn pri" id="addLockBtn" type="button" onclick="addPositionLock()">+ 위치 락 넣기</button>
+        </div>
+        <div class="lock-preview" id="lockPreview"><b>PREVIEW</b> 활성 레퍼런스를 불러오는 중…</div>
+      </div>
+    </div>
     <!-- 프롬프트 -->
     <div class="sec" id="secPrompt">
-      <div class="sec-h" onclick="this.parentElement.classList.toggle('fold')"><span class="n">PROMPT</span><span class="t">프롬프트 (한국어)</span><span class="hint">고치면 복사에 바로 반영</span></div>
+      <div class="sec-h" onclick="this.parentElement.classList.toggle('fold')"><span class="n">PROMPT</span><span class="t">프롬프트 직접 편집 (한국어 / English)</span><span class="hint">양쪽 모두 바로 수정 · 영문 복사에 즉시 반영</span></div>
       <div class="body" id="promptBody" style="padding:12px"></div>
     </div>
     <!-- 검수 -->
@@ -119,22 +163,76 @@ font-family:var(--mono);font-size:12px;line-height:1.8;padding:8px 14px;resize:v
 </div>
 <div class="bar"><div class="bar-in">
   <button class="btn pri" onclick="copyEn()">영문 프롬프트 복사 (씨댄스용)</button>
-  <button class="btn" onclick="copyKoForClaude()">한국어만 복사 → Claude</button>
+  <button class="btn" onclick="copyKo()">한국어 프롬프트 복사</button>
   <span class="hint2" id="cnt"></span>
 </div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 let SCENE=null, PART=null;   // 현재 씬 데이터, 현재 파트 id
+let SOURCE_NAME='내장 씬', DIRTY=false;
 
-/* ── 드롭 ── */
+/* ── HTML 편집기 / JSON 불러오기 ──
+   HTML은 텍스트로만 읽고 EMBEDDED_SCENE JSON만 꺼낸다. 가져온 HTML의 스크립트는 실행하지 않는다. */
 const drop=document.getElementById('drop'), fi=document.getElementById('fileInput');
-drop.onclick=()=>fi.click();
+function openSourcePicker(){ fi.value=''; fi.click(); }
+drop.onclick=openSourcePicker;
 fi.onchange=e=>{if(e.target.files[0])readFile(e.target.files[0])};
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
 drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)readFile(f)});
-function readFile(file){const r=new FileReader();r.onload=()=>{try{loadScene(JSON.parse(r.result))}catch(e){toast('JSON 파싱 실패: '+e.message)}};r.readAsText(file)}
+function readFile(file){
+  const r=new FileReader();
+  r.onload=()=>{try{loadImportedSource(String(r.result||''),file.name)}catch(e){toast('불러오기 실패: '+e.message)}};
+  r.onerror=()=>toast('파일을 읽지 못했습니다');
+  r.readAsText(file);
+}
+function loadImportedSource(text,name){
+  const trimmed=String(text||'').trim();
+  let data;
+  if(/\.json$/i.test(name||'') || trimmed.charAt(0)==='{') data=JSON.parse(trimmed);
+  else data=extractEmbeddedScene(trimmed);
+  loadScene(data,{sourceName:name||'가져온 파일'});
+  toast(/\.html?$/i.test(name||'')?'HTML에서 씬을 불러왔습니다':'씬 JSON을 불러왔습니다');
+}
+/* HTML에 심긴 씬 상수의 JSON 범위를 문자열/이스케이프까지 고려해 찾는다. */
+function embeddedSceneRange(text){
+  const marker=/(?:const|let|var)\s+EMBEDDED_SCENE\s*=\s*/g;
+  let m, emptyRange=null;
+  while((m=marker.exec(text))){
+    const start=text.indexOf('{',m.index+m[0].length); if(start<0)continue;
+    let depth=0, quote='', escaped=false, end=-1;
+    for(let i=start;i<text.length;i++){
+      const ch=text[i];
+      if(quote){
+        if(escaped) escaped=false;
+        else if(ch==='\\') escaped=true;
+        else if(ch===quote) quote='';
+        continue;
+      }
+      if(ch==='"'||ch==="'"){ quote=ch; continue; }
+      if(ch==='{') depth++;
+      else if(ch==='}' && --depth===0){end=i+1;break;}
+    }
+    if(end<0)continue;
+    try{
+      const data=JSON.parse(text.slice(start,end));
+      if(data&&data.schema==='xconda-scene-v1')return {start:start,end:end};
+      if(data&&typeof data==='object'&&!Array.isArray(data)&&!Object.keys(data).length)emptyRange={start:start,end:end};
+    }catch(e){}
+    marker.lastIndex=Math.max(marker.lastIndex,start+1);
+  }
+  return emptyRange;
+}
+function extractEmbeddedScene(html){
+  const range=embeddedSceneRange(html);
+  if(!range) throw new Error('HTML에서 EMBEDDED_SCENE을 찾지 못했습니다');
+  let data;
+  try{ data=JSON.parse(html.slice(range.start,range.end)); }
+  catch(e){ throw new Error('HTML 안의 씬 JSON을 읽을 수 없습니다: '+e.message); }
+  if(!data||data.schema!=='xconda-scene-v1') throw new Error('HTML에 xconda-scene-v1 씬이 없습니다');
+  return data;
+}
 
 /* __ROOM_COMPAT_START__ — v9.13: scene-v1의 미터 room(center/width/depth/obstacles)을
    도구가 읽는 px 필드(centerPx/widthPx/depthPx/items, 40px=1m)로 채운다.
@@ -162,17 +260,27 @@ function normalizeRoom(data){
 /* __ROOM_COMPAT_END__ */
 
 /* ── 씬 로드 ── */
-function loadScene(data){
-  if(data.schema!=='xconda-scene-v1'){ toast('scene-v1 형식이 아닙니다'); return; }
+function loadScene(data,opts){
+  if(!data||data.schema!=='xconda-scene-v1'){ toast('scene-v1 형식이 아닙니다'); return; }
   normalizeRoom(data);
   SCENE=data;
-  document.getElementById('hSlug').textContent=data.sceneId+' · '+(data.title||'');
+  SOURCE_NAME=(opts&&opts.sourceName)||SOURCE_NAME||'내장 씬';
+  DIRTY=false;
+  document.getElementById('hSlug').textContent=(data.sceneId||'SCENE')+' · '+(data.title||'');
   document.getElementById('hMeta').textContent=(data.model||'')+' · 파트 '+(data.parts||[]).length+'개';
   document.getElementById('drop').style.display='none';
+  document.getElementById('sourceStrip').style.display='flex';
+  document.getElementById('sourceName').textContent=SOURCE_NAME;
   document.getElementById('stage').classList.add('on');
+  updateSaveState();
   buildTabs();
-  selectPart((data.parts[0]||{}).partId);
-  toast('씬을 불러왔습니다');
+  selectPart(((data.parts||[])[0]||{}).partId);
+}
+function markDirty(){ DIRTY=true; updateSaveState(); }
+function updateSaveState(){
+  const el=document.getElementById('saveState'); if(!el)return;
+  el.textContent=DIRTY?'수정됨 · HTML로 저장하세요':'저장할 변경 없음';
+  el.classList.toggle('dirty',DIRTY);
 }
 function buildTabs(){
   const t=document.getElementById('tabs'); t.innerHTML='';
@@ -186,7 +294,7 @@ function curPart(){ return (SCENE.parts||[]).find(p=>p.partId===PART); }
 function selectPart(pid){
   PART=pid;
   [...document.getElementById('tabs').children].forEach(b=>b.classList.toggle('on',b.dataset.pid===pid));
-  renderPanels(); renderCast(); renderPrompt(); audit();
+  renderPanels(); renderCast(); buildLockTool(); renderPrompt(); audit();
 }
 
 /* ── 컷별 패널 — 흰 바탕·검은 선 기술도면. 이 컷의 카메라 프레이밍 + 인물 위치만 ── */
@@ -301,13 +409,15 @@ function copyRefPrompt(kind,tag){
 /* ── 등장인물/레퍼런스 목록 ── */
 function renderCast(){
   const el=document.getElementById('castList'); if(!el)return; const p=curPart();
-  const uses=(p&&p.usesRefs)||[];
+  const uses=(p&&p.usesRefs)||[], active=partReferenceOptions();
   const grp=function(kind,title,arr){
     if(!arr||!arr.length)return '';
     const canPrompt=(kind==='char'||kind==='bg'||kind==='prop');
     return '<div class="ref-grp">'+title+'</div>'+arr.map(function(c){
-      const on=uses.includes(c.tag);
-      return '<div class="cast-item'+(on?'':' off')+'"><span class="rtag">'+esc(c.tag)+'</span> <span class="cn" style="color:'+(c.color||'#ccc')+'">'+esc(c.name)+'</span>'+
+      const local=active.find(function(x){return x.globalTag===c.tag||x.nameKo===c.name;});
+      const on=!!local||uses.includes(c.tag);
+      const shown=local?local.tag:c.tag;
+      return '<div class="cast-item'+(on?'':' off')+'"><span class="rtag">'+esc(shown)+'</span> <span class="cn" style="color:'+(c.color||'#ccc')+'">'+esc(c.name)+'</span>'+
         (c.role?' <span class="cr">'+esc(c.role)+'</span>':'')+(on?' <span class="ron">✓ 사용</span>':' <span class="cr">미사용</span>')+
         (c.wardrobe?'<div class="cw">'+esc(c.wardrobe)+'</div>':'')+(c.refImage?'<div class="cw">'+esc(c.refImage)+'</div>':'')+
         (canPrompt?'<div class="reflink"><button class="btn sm" onclick="copyRefPrompt(\''+kind+'\',\''+esc(c.tag).replace(/'/g,"\\'")+'\')">📋 레퍼런스 프롬프트 복사</button></div>':'')+
@@ -319,22 +429,139 @@ function renderCast(){
     || '<div style="color:var(--dim);padding:10px">레퍼런스 없음</div>';
 }
 
+/* ── 위치 고정 레퍼런스 — 알려진 문장 템플릿으로 한/영을 동시에 넣는다 ── */
+let LOCK_REFS=[];
+function refKindFor(globalTag,name){
+  const r=SCENE.refs||{};
+  const groups=[['character',r.characters||[]],['background',r.backgrounds||[]],['prop',r.props||[]]];
+  for(const g of groups){
+    const item=g[1].find(function(x){return (globalTag&&x.tag===globalTag)||(name&&x.name===name);});
+    if(item) return {kind:g[0],item:item};
+  }
+  return {kind:'character',item:null};
+}
+function partReferenceOptions(){
+  const p=curPart(); if(!p||!p.prompt)return [];
+  const b=(p.prompt.blocks||[]).find(function(x){return String(x.n)==='02';})||{};
+  const out=[], byTag={};
+  String(b.ko||'').split('\n').forEach(function(line){
+    const m=line.match(/^\s*[·•-]?\s*(@Image\d+)\s+[—–-]\s+(.+?)(?:\s*\(씬 전역 태그:\s*([^)]+)\)|\s*:|$)/);
+    if(!m)return;
+    const item={tag:m[1],nameKo:m[2].trim(),nameEn:'',globalTag:(m[3]||'').trim()};
+    const kind=refKindFor(item.globalTag,item.nameKo); item.kind=kind.kind; item.ref=kind.item;
+    out.push(item); byTag[item.tag]=item;
+  });
+  String(b.en||'').split('\n').forEach(function(line){
+    const m=line.match(/^\s*[·•-]?\s*(@Image\d+)\s+[—–-]\s+(.+?)(?:\s*\(scene-wide tag:\s*([^)]+)\)|\s*:|$)/i);
+    if(m&&byTag[m[1]]) byTag[m[1]].nameEn=m[2].trim();
+  });
+  if(out.length)return out;
+  const all=[].concat((SCENE.refs||{}).characters||[],(SCENE.refs||{}).backgrounds||[],(SCENE.refs||{}).props||[]);
+  (p.usesRefs||[]).forEach(function(tag,i){
+    const ref=all.find(function(x){return x.tag===tag;});
+    const local=/^@Image\d+$/.test(tag)?tag:'@Image'+(i+1);
+    const kind=refKindFor(ref&&ref.tag,ref&&ref.name);
+    out.push({tag:local,nameKo:(ref&&ref.name)||tag,nameEn:(ref&&ref.nameEn)||(ref&&ref.name)||tag,
+              globalTag:(ref&&ref.tag)||tag,kind:kind.kind,ref:ref||null});
+  });
+  return out;
+}
+function buildLockTool(){
+  const refSel=document.getElementById('lockRef'), cutSel=document.getElementById('lockCut');
+  if(!refSel||!cutSel)return;
+  LOCK_REFS=partReferenceOptions(); refSel.innerHTML='';
+  const kindKo={character:'인물',background:'배경',prop:'소품'};
+  LOCK_REFS.forEach(function(r,i){
+    const o=document.createElement('option'); o.value=String(i);
+    o.textContent=r.tag+' · '+r.nameKo+' · '+(kindKo[r.kind]||'레퍼런스'); refSel.appendChild(o);
+  });
+  cutSel.innerHTML='';
+  (((curPart()||{}).prompt||{}).cuts||[]).forEach(function(c,i){
+    const o=document.createElement('option'); o.value=String(i); o.textContent=(c.lb||('CUT '+(i+1)))+' · '+(c.tc||''); cutSel.appendChild(o);
+  });
+  const ok=LOCK_REFS.length>0;
+  refSel.disabled=!ok; document.getElementById('addLockBtn').disabled=!ok;
+  updateLockScope();
+}
+function updateLockScope(){
+  const scope=document.getElementById('lockScope'), cut=document.getElementById('lockCut');
+  cut.disabled=!scope||scope.value!=='cut'||!cut.options.length;
+  updateLockPreview();
+}
+function lockPhrases(){
+  const ref=LOCK_REFS[+(document.getElementById('lockRef').value||0)]; if(!ref)return null;
+  const h=document.getElementById('lockHorizontal').value, d=document.getElementById('lockDepth').value;
+  const scope=document.getElementById('lockScope').value;
+  const cutIndex=+(document.getElementById('lockCut').value||0);
+  const cut=((((curPart()||{}).prompt||{}).cuts||[])[cutIndex]||{});
+  const hk={left:'왼쪽',center:'중앙',right:'오른쪽'}, he={left:'frame-left',center:'frame-center',right:'frame-right'};
+  const dk={foreground:'전경',midground:'중경',background:'후경'}, de={foreground:'foreground',midground:'midground',background:'background'};
+  const cutRef=(cut.lb||'').split(' · ')[0].trim()||'선택한 컷';
+  const scopeKo=scope==='cut'?(cutRef+'에서'):'이 파트의 모든 컷에서';
+  const scopeEn=scope==='cut'?('in '+cutRef):'in every cut of this part';
+  const rules={
+    character:['레퍼런스는 얼굴·머리·의상 정체성에만 쓰고, 위치와 자세는 이 지시를 따른다.','Use the reference only for face, hair, and wardrobe identity; position and pose follow this instruction.'],
+    background:['레퍼런스는 공간·조명 일관성에만 쓰고, 화면 배치와 카메라는 이 지시를 따른다.','Use the reference only for spatial and lighting continuity; composition and camera follow this instruction.'],
+    prop:['레퍼런스는 형태·재질 정체성에만 쓰고, 화면 위치는 이 지시를 따른다.','Use the reference only for shape and material identity; screen position follows this instruction.']
+  };
+  const rule=rules[ref.kind]||rules.character, bullet=scope==='part'?'· ':'';
+  const ko=bullet+'위치 고정 — '+ref.tag+' '+ref.nameKo+'는 '+scopeKo+' 프레임 '+hk[h]+' '+dk[d]+'에 고정된다. '+rule[0];
+  const en=bullet+'POSITION LOCK — '+ref.tag+' '+(ref.nameEn||ref.nameKo)+' remains fixed at '+he[h]+' in the '+de[d]+' '+scopeEn+'. '+rule[1];
+  return {ko:ko,en:en,tag:ref.tag,scope:scope,cutIndex:cutIndex};
+}
+function updateLockPreview(){
+  const el=document.getElementById('lockPreview'); if(!el)return;
+  const p=lockPhrases();
+  el.innerHTML=p?'<b>PREVIEW · KO / EN</b>\n'+esc(p.ko)+'\n'+esc(p.en):'<b>PREVIEW</b> 이 파트에서 활성 레퍼런스를 찾지 못했습니다.';
+}
+function replaceGeneratedLock(body,lang,tag,line){
+  const safe=tag.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const re=lang==='ko'
+    ? new RegExp('^[·•-]?\\s*위치 고정\\s*[—–:-]\\s*'+safe+'(?:\\s|$)','i')
+    : new RegExp('^[·•-]?\\s*POSITION LOCK\\s*[—–:-]\\s*'+safe+'(?:\\s|$)','i');
+  const lines=String(body||'').split('\n').filter(function(x){return !re.test(x.trim());});
+  while(lines.length&&!lines[lines.length-1].trim())lines.pop();
+  lines.push(line); return lines.join('\n');
+}
+function addPositionLock(){
+  const p=curPart(), lock=lockPhrases(); if(!p||!lock){toast('활성 레퍼런스를 먼저 선택하세요');return;}
+  if(lock.scope==='cut'){
+    const cut=(p.prompt.cuts||[])[lock.cutIndex]; if(!cut){toast('컷을 선택하세요');return;}
+    cut.ko=replaceGeneratedLock(cut.ko,'ko',lock.tag,lock.ko);
+    cut.en=replaceGeneratedLock(cut.en,'en',lock.tag,lock.en);
+  }else{
+    let block=(p.prompt.blocks||[]).find(function(b){return String(b.n)==='10';});
+    if(!block){ block={n:'10',t:'포지티브 락',tEn:'POSITIVE LOCKS',ko:'',en:''}; p.prompt.blocks.push(block); }
+    block.ko=replaceGeneratedLock(block.ko,'ko',lock.tag,lock.ko);
+    block.en=replaceGeneratedLock(block.en,'en',lock.tag,lock.en);
+  }
+  markDirty(); renderPrompt(); audit();
+  toast('위치 고정 레퍼런스를 한글·영문에 함께 넣었습니다');
+}
+
 /* ── 프롬프트 (파트별 blocks/cuts) ── */
+function langPairMarkup(p,blockIndex,cutIndex,koKey,enKey,koValue,enValue,rows){
+  const where=cutIndex==null?' data-blk="'+blockIndex+'"':' data-cut="'+cutIndex+'"';
+  return '<div class="lang-grid">'+
+    '<div class="lang-pane"><span class="lang-lb">KO · 한국어</span><textarea rows="'+rows+'" data-part="'+esc(p.partId)+'"'+where+' data-k="'+koKey+'">'+esc(koValue||'')+'</textarea></div>'+
+    '<div class="lang-pane"><span class="lang-lb">EN · Seedance output</span><textarea rows="'+rows+'" data-part="'+esc(p.partId)+'"'+where+' data-k="'+enKey+'">'+esc(enValue||'')+'</textarea></div>'+
+    '</div>';
+}
 function renderPrompt(){
   const body=document.getElementById('promptBody'); if(!body)return; body.innerHTML='';
   const p=curPart(); if(!p||!p.prompt){ body.innerHTML='<div style="color:var(--dim);padding:20px">이 파트에 프롬프트 데이터가 없습니다.</div>'; return; }
   const blocks=p.prompt.blocks||[];
   blocks.forEach((b,i)=>{
     const w=document.createElement('div'); w.className='blk'+(b.n!=='02'&&b.n!=='08'?' fold':'');
-    let inner='<div class="blk-h" onclick="this.parentElement.classList.toggle(\'fold\')"><span class="bn">'+(b.n||'')+'</span><span class="bt">'+esc(b.t||'')+'</span><span class="car">▾</span></div><div class="body">';
+    let inner='<div class="blk-h" onclick="this.parentElement.classList.toggle(\'fold\')"><span class="bn">'+(b.n||'')+'</span><span class="bt">'+esc(b.t||'')+' / '+esc(b.tEn||'')+'</span><span class="car">▾</span></div><div class="body">';
     if(b.cuts){
-      inner+='<div class="pane"><textarea rows="2" data-part="'+p.partId+'" data-blk="'+i+'" data-k="headKo">'+esc(b.headKo||'')+'</textarea></div>';
+      inner+=langPairMarkup(p,i,null,'headKo','headEn',b.headKo,b.headEn,2);
       (p.prompt.cuts||[]).forEach((c,j)=>{
         inner+='<div class="cut-h">'+esc(c.tc||'')+' · '+esc(c.lb||'')+(c.dlg?'<span class="dlg">💬 '+esc(c.dlg)+'</span>':'')+'</div>';
-        inner+='<div class="pane"><textarea rows="4" data-part="'+p.partId+'" data-cut="'+j+'" data-k="ko">'+esc(c.ko||'')+'</textarea></div>';
+        inner+=langPairMarkup(p,i,j,'ko','en',c.ko,c.en,5);
       });
     } else {
-      inner+='<div class="pane"><textarea rows="4" data-part="'+p.partId+'" data-blk="'+i+'" data-k="ko">'+esc(b.ko||'')+'</textarea></div>';
+      inner+=langPairMarkup(p,i,null,'ko','en',b.ko,b.en,5);
     }
     inner+='</div>'; w.innerHTML=inner; body.appendChild(w);
   });
@@ -343,6 +570,8 @@ function renderPrompt(){
       const p=curPart();
       if(t.dataset.cut!==undefined) p.prompt.cuts[+t.dataset.cut][t.dataset.k]=t.value;
       else p.prompt.blocks[+t.dataset.blk][t.dataset.k]=t.value;
+      markDirty();
+      if(t.dataset.cut!==undefined&&t.dataset.k==='ko')renderPanels();
       audit();
     });
   });
@@ -378,7 +607,38 @@ function assemble(p,L){
   return L==='en' ? seedanceSafe(raw) : raw;
 }
 function copyEn(){ cp(assembleEn(),'영문 프롬프트 복사됨 (씨댄스용)'); }
-function copyKoForClaude(){ cp('엑스콘다 '+SCENE.sceneId+' Part '+PART+' 한국어를 고쳤습니다. 영문 맞춰 새로 만들어주세요.\n\n'+assembleKo(),'한국어 복사됨 → 대화창에'); }
+function copyKo(){ cp(assembleKo(),'한국어 프롬프트 복사됨'); }
+
+/* 현재 편집기 자체를 다시 열 수 있는 단일 HTML로 저장한다. JSON 다운로드는 만들지 않는다. */
+function editedHtmlSource(){
+  if(!SCENE) throw new Error('먼저 HTML 또는 씬을 불러오세요');
+  const clone=document.documentElement.cloneNode(true);
+  const q=function(s){return clone.querySelector(s);};
+  const clear=['#tabs','#castList','#panelGrid','#promptBody','#audit'];
+  clear.forEach(function(s){const el=q(s);if(el)el.innerHTML='';});
+  const stage=q('#stage'); if(stage)stage.classList.remove('on');
+  const source=q('#sourceStrip'); if(source)source.style.display='none';
+  const dz=q('#drop'); if(dz)dz.style.display='';
+  const to=q('#toast'); if(to){to.classList.remove('show');to.textContent='';}
+  let html='<!doctype html>\n'+clone.outerHTML;
+  const range=embeddedSceneRange(html);
+  if(!range) throw new Error('저장 템플릿에서 씬 슬롯을 찾지 못했습니다');
+  const json=JSON.stringify(SCENE,null,1).replace(/</g,'\\u003c');
+  return html.slice(0,range.start)+json+html.slice(range.end);
+}
+function downloadEditedHtml(){
+  try{
+    const html=editedHtmlSource();
+    const base=(SOURCE_NAME||SCENE.sceneId||'xconda').replace(/\.(?:html?|json)$/i,'').replace(/[^0-9A-Za-z가-힣._-]+/g,'_');
+    const name=(base||'xconda')+'_edited.html';
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'}), url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url)},0);
+    SOURCE_NAME=name; DIRTY=false;
+    document.getElementById('sourceName').textContent=SOURCE_NAME; updateSaveState();
+    toast('수정본 HTML을 저장했습니다');
+  }catch(e){toast('HTML 저장 실패: '+e.message);}
+}
 
 
 /* ── 자세(pose) 파서 v1 ── */
@@ -411,7 +671,10 @@ function audit(){
     if(bad.length) out.push('앵커 밖 화각: '+bad.join('° · ')+'° → 9단계에서 고르세요');
     const gore=/선홍색\s*피|새빨간\s*피|피가\s*뿜|bright red blood/i;
     if(gore.test(ko)) out.push('만화적 유혈 어휘 → 검붉은 액체로');
-    document.getElementById('cnt').textContent='한글 '+ko.length.toLocaleString()+'자 · 파트 '+PART;
+    const en=assembleEn();
+    document.getElementById('cnt').textContent='한글 '+ko.length.toLocaleString()+'자 · 영문 '+en.length.toLocaleString()+'자 · 파트 '+PART;
+    const koLocks=(ko.match(/위치 고정\s*—/g)||[]).length, enLocks=(en.match(/POSITION LOCK\s*—/gi)||[]).length;
+    if(koLocks!==enLocks)out.push('위치 고정 락의 한/영 개수가 다릅니다: KO '+koLocks+' · EN '+enLocks);
   }
   el.innerHTML = out.length ? out.map(o=>'<div class="li">! '+o+'</div>').join('') : '<div class="li ok">✓ 확인할 것 없음</div>';
 }
@@ -433,7 +696,7 @@ const EMBEDDED_SCENE = {};
           sessionStorage.removeItem('XCONDA_IMPORT_SCENE');
           const data = JSON.parse(imported);
           if(data && data.schema === 'xconda-scene-v1'){
-            loadScene(data);
+            loadScene(data,{sourceName:'글콘티에서 가져온 씬'});
             toast('글콘티에서 변환된 씬을 불러왔습니다');
             return;
           }
@@ -441,6 +704,6 @@ const EMBEDDED_SCENE = {};
       }
     }
   } catch(e){}
-  if(EMBEDDED_SCENE && EMBEDDED_SCENE.schema){ loadScene(EMBEDDED_SCENE); }
+  if(EMBEDDED_SCENE && EMBEDDED_SCENE.schema){ loadScene(EMBEDDED_SCENE,{sourceName:(EMBEDDED_SCENE.sceneId||'XCONDA')+'_editor.html'}); }
 })();
 </script>

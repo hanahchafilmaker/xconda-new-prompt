@@ -25,7 +25,7 @@ function eq(label, got, want) {
 }
 
 // 1) loadScene이 실제로 이 함수를 호출하는가
-eq('loadScene이 normalizeRoom을 호출한다', /function loadScene\(data\)\{[\s\S]{0,200}?normalizeRoom\(data\);/.test(html), true);
+eq('loadScene이 normalizeRoom을 호출한다', /function loadScene\(data(?:,opts)?\)\{[\s\S]{0,260}?normalizeRoom\(data\);/.test(html), true);
 
 // 2) 미터 room → px (assets/scene_compat.py 와 같은 값)
 const scene = JSON.parse(readFileSync(FIXTURE, 'utf8'));

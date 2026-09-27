@@ -60,7 +60,13 @@ check('등장인물/레퍼런스 목록이 채워진다', d.getElementById('cast
 const blocks = d.getElementById('promptBody').children.length;
 check('프롬프트 10블록이 나온다', blocks === 10, `${blocks}블록`);
 const areas = d.getElementById('promptBody').querySelectorAll('textarea');
-check('편집용 textarea가 생긴다', areas.length >= 10, `${areas.length}개`);
+check('편집용 textarea가 생긴다', areas.length >= 20, `${areas.length}개`);
+check('한국어와 영문 textarea가 나란히 생긴다',
+  d.querySelectorAll('#promptBody textarea[data-k="ko"]').length > 0 && d.querySelectorAll('#promptBody textarea[data-k="en"]').length > 0,
+  '한쪽 언어 입력창이 없음');
+check('Claude HTML과 JSON을 모두 받는다', d.getElementById('fileInput').accept.includes('.html') && d.getElementById('fileInput').accept.includes('.json'), d.getElementById('fileInput').accept);
+check('수정본 HTML 저장 버튼이 있다', d.getElementById('saveHtmlBtn') !== null, '저장 버튼 없음');
+check('Claude 재요청 버튼이 없다', !d.querySelector('.bar').textContent.includes('Claude'), d.querySelector('.bar').textContent.trim());
 const blk02 = d.getElementById('promptBody').children[1];
 check('02·08 블록은 펴져 있다', !!blk02 && !blk02.classList.contains('fold'), blk02 ? 'fold 걸림' : '02블록 자체가 없음');
 
@@ -83,5 +89,34 @@ if (!tab3) {
   check('파트를 바꾸면 패널이 다시 그려진다', d.getElementById('panelGrid').querySelectorAll('svg').length > 0, 'SVG 0개');
 }
 
-console.log(failed ? `\n실패 ${failed}건` : '\nUI 스모크 통과 — 웹에서 보이는 요소 전부 렌더됨');
+// Claude가 만든 기존 HTML을 다시 읽고, 브라우저 안에서 직접 한/영을 수정할 수 있어야 한다.
+const extracted = dom.window.extractEmbeddedScene(html);
+check('HTML의 EMBEDDED_SCENE을 다시 읽는다', extracted.schema === 'xconda-scene-v1' && extracted.parts.length === 5, extracted.schema);
+const enArea = d.querySelector('#promptBody textarea[data-k="en"]');
+if (enArea) {
+  enArea.value += '\nDIRECT EN EDIT TEST';
+  enArea.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+  check('영문 직접 수정이 씨댄스 복사본에 즉시 반영된다', dom.window.assembleEn().includes('DIRECT EN EDIT TEST'), '수정 문구가 없음');
+  check('직접 수정하면 저장 상태가 수정됨으로 바뀐다', d.getElementById('saveState').classList.contains('dirty'), d.getElementById('saveState').textContent);
+} else {
+  check('영문 직접 수정이 씨댄스 복사본에 즉시 반영된다', false, '영문 textarea 없음');
+}
+
+const lockRefs = d.getElementById('lockRef').options.length;
+check('위치 락 도구에 현재 파트 레퍼런스가 채워진다', lockRefs > 0, `${lockRefs}개`);
+check('위치 락 영문 미리보기에 실제 인물명이 나온다', /POSITION LOCK.+(Hyunwoo|Baksu)/.test(d.getElementById('lockPreview').textContent), d.getElementById('lockPreview').textContent.slice(0, 180));
+d.getElementById('lockHorizontal').value = 'right';
+dom.window.addPositionLock();
+check('위치 락이 한국어와 영문에 동시에 들어간다', dom.window.assembleKo().includes('위치 고정 —') && dom.window.assembleEn().includes('POSITION LOCK —'), '한쪽 락이 없음');
+const firstLockTag = d.getElementById('lockRef').options[d.getElementById('lockRef').selectedIndex].textContent.split(' · ')[0];
+d.getElementById('lockHorizontal').value = 'left';
+dom.window.addPositionLock();
+const lockLines = dom.window.assembleEn().split('\n').filter((line) => line.includes(`POSITION LOCK — ${firstLockTag}`));
+check('같은 레퍼런스 위치 락은 중복 대신 교체된다', lockLines.length === 1 && lockLines[0].includes('frame-left') && !lockLines[0].includes('frame-right'), lockLines.join(' | '));
+
+const savedHtml = dom.window.editedHtmlSource();
+const reopened = dom.window.extractEmbeddedScene(savedHtml);
+check('수정본 HTML에 편집한 씬이 다시 심긴다', reopened.schema === 'xconda-scene-v1' && JSON.stringify(reopened).includes('POSITION LOCK'), '저장 HTML에 수정 내용 없음');
+
+console.log(failed ? `\n실패 ${failed}건` : '\nUI 스모크 통과 — HTML 불러오기·한영 직접 편집·위치 락·재저장까지 렌더됨');
 process.exit(failed ? 1 : 0);
